@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'models/settings.dart';
 import 'models/todo.dart';
+import 'view/settings_screen.dart';
 
 void main() {
   runApp(
@@ -98,6 +99,16 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const SettingsScreen(),
+              ),
+            ),
+            icon: const Icon(Icons.settings),
+          )
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
