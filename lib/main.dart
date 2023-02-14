@@ -11,7 +11,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => TodoModel()),
-        ChangeNotifierProvider(create: (context) => SettingsModel())
+        ChangeNotifierProvider(create: (context) => SettingsModel()),
       ],
       child: const SimpleTodoApp(),
     ),
@@ -53,29 +53,18 @@ class SimpleTodoApp extends StatelessWidget {
   }
 }
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key, required this.title});
 
   final String title;
 
   @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final model = context.watch<TodoModel>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context).push(
@@ -87,24 +76,29 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+      body: ReorderableListView.builder(
+        itemBuilder: (context, index) {
+          return ListTile(
+            key: ValueKey(model.active[index]),
+            title: Text(model.active[index].content),
+            onTap: () => context.showSnackBar('Toasty!'),
+          );
+        },
+        itemCount: model.active.length,
+        onReorder: (oldIndex, newIndex) => model.moveItem(oldIndex, newIndex),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    );
+  }
+}
+
+extension SnackBarExtension on BuildContext {
+  void showSnackBar(String content) {
+    final messenger = ScaffoldMessenger.of(this);
+
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(content),
       ),
     );
   }
