@@ -16,7 +16,14 @@ class ColorPickerDialog extends StatefulWidget {
 }
 
 class _ColorPickerDialogState extends State<ColorPickerDialog> {
-  late Color _currentColor = widget.initialColor;
+  late Color _currentColor;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _currentColor = widget.initialColor;
+  }
 
   void _setCurrentColor(Color color) {
     setState(() {

@@ -10,7 +10,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SettingsModel model = context.watch<SettingsModel>();
-    final Color color = model.color ?? Colors.transparent;
+    final Color color = model.color ?? Colors.white;
 
     return Scaffold(
       appBar: AppBar(),

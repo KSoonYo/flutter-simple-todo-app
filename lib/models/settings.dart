@@ -20,13 +20,11 @@ class SettingsModel with ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   set themeMode(ThemeMode value) {
     _storeThemeMode(value);
-    _updateThemeMode(value);
   }
 
   Color? get color => _color;
   set color(Color? value) {
     _storeColor(value);
-    _updateColor(value);
   }
 
   Future<void> _storeThemeMode(ThemeMode value) async {
