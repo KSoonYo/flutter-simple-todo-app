@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-class TodoModel extends ChangeNotifier {
+class TodoModel with ChangeNotifier {
   final _active = <Todo>[
     const Todo('Pull down to add'),
     const Todo('Swipe left to remove'),

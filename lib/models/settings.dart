@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsModel extends ChangeNotifier {
+class SettingsModel with ChangeNotifier {
   static const keyThemeMode = 'theme_mode';
   static const keyColor = 'color';
 
