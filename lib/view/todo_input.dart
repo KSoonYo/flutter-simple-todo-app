@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class TodoInput extends StatefulWidget {
-  const TodoInput({super.key, required this.onSubmit, this.initialValue});
+  const TodoInput(
+      {super.key,
+      required this.onSubmit,
+      required this.onCancel,
+      this.initialValue});
 
   final void Function(String value) onSubmit;
+  final void Function() onCancel;
   final String? initialValue;
 
   @override
@@ -12,6 +17,7 @@ class TodoInput extends StatefulWidget {
 
 class _TodoInputState extends State<TodoInput> {
   late TextEditingController _controller;
+  var _isEmpty = true;
 
   @override
   void initState() {
@@ -27,6 +33,12 @@ class _TodoInputState extends State<TodoInput> {
     super.dispose();
   }
 
+  void _setEmpty(bool empty) {
+    setState(() {
+      _isEmpty = empty;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -35,13 +47,25 @@ class _TodoInputState extends State<TodoInput> {
         controller: _controller,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
+        style: Theme.of(context).primaryTextTheme.headlineLarge,
+        textCapitalization: TextCapitalization.sentences,
+        decoration: InputDecoration(
+          border: const UnderlineInputBorder(),
+          hintText: "What's up?",
+          suffixIcon: !_isEmpty
+              ? IconButton(
+                  onPressed: _controller.clear,
+                  icon: const Icon(Icons.clear),
+                )
+              : null,
+        ),
+        autofocus: true,
+        onChanged: (value) => _setEmpty(value.isEmpty),
         onSubmitted: (value) {
           widget.onSubmit(value);
           _controller.clear();
         },
-        decoration: const InputDecoration(
-          border: UnderlineInputBorder(),
-        ),
+        onTapOutside: (_) => widget.onCancel(),
       ),
     );
   }

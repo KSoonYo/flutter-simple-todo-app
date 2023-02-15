@@ -51,10 +51,11 @@ class SettingsScreen extends StatelessWidget {
                 dimension: 20.0,
                 child: Container(
                   decoration: BoxDecoration(
-                      color: color,
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      )),
+                    color: color,
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
                 ),
               ),
             ),
