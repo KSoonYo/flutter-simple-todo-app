@@ -17,7 +17,7 @@ class TodoModel with ChangeNotifier {
 
   bool get isEmpty => _active.isEmpty && _archived.isEmpty;
 
-  void addItem({String content = ''}) {
+  void addItem(String content) {
     _active.add(Todo(content));
     notifyListeners();
   }

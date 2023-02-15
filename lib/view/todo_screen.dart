@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_todo/view/todo_input.dart';
 
 import '../models/todo.dart';
 import 'settings_screen.dart';
@@ -27,6 +28,7 @@ class TodoScreen extends StatelessWidget {
         ],
       ),
       body: ReorderableListView.builder(
+        header: TodoInput(onSubmit: model.addItem),
         itemBuilder: (context, index) {
           return ListTile(
             key: ValueKey(model.active[index]),
