@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 class TodoInput extends StatefulWidget {
-  const TodoInput(
-      {super.key,
-      required this.onSubmit,
-      required this.onCancel,
-      this.initialValue});
+  const TodoInput({
+    super.key,
+    required this.onSubmit,
+    required this.onCancel,
+    this.focusNode,
+    this.initialValue,
+  });
 
   final void Function(String value) onSubmit;
   final void Function() onCancel;
+  final FocusNode? focusNode;
   final String? initialValue;
 
   @override
@@ -45,6 +48,7 @@ class _TodoInputState extends State<TodoInput> {
       padding: const EdgeInsets.all(16.0),
       child: TextField(
         controller: _controller,
+        focusNode: widget.focusNode,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
         style: Theme.of(context).primaryTextTheme.headlineLarge,
@@ -59,7 +63,6 @@ class _TodoInputState extends State<TodoInput> {
                 )
               : null,
         ),
-        autofocus: true,
         onChanged: (value) => _setEmpty(value.isEmpty),
         onSubmitted: (value) {
           widget.onSubmit(value);

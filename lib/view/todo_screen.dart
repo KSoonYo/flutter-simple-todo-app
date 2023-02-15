@@ -18,8 +18,29 @@ class TodoScreen extends StatefulWidget {
 
 class _TodoScreenState extends State<TodoScreen> {
   var _editing = false;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+
+    super.dispose();
+  }
 
   void _setEditing(bool value) {
+    if (value) {
+      _focusNode.requestFocus();
+    } else {
+      _focusNode.unfocus();
+    }
+
     setState(() {
       _editing = value;
     });
@@ -68,6 +89,7 @@ class _TodoScreenState extends State<TodoScreen> {
                             model.addItem(value);
                             _setEditing(false);
                           },
+                          focusNode: _focusNode,
                           onCancel: () => _setEditing(false),
                         ),
                       ],
