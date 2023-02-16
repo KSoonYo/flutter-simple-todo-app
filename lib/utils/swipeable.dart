@@ -29,7 +29,7 @@ class Swipeable extends StatefulWidget {
       this.confirmSwipe,
       this.background,
       this.resizeDuration = const Duration(milliseconds: 300),
-      this.swipeThresholds = const <SwipeDirection, double>{},
+      this.swipeThresholds = const <SwipeType, double>{},
       this.movementDuration = const Duration(milliseconds: 200),
       this.crossAxisEndOffset = 0.0,
       this.dragStartBehavior = DragStartBehavior.start,
@@ -41,7 +41,7 @@ class Swipeable extends StatefulWidget {
   final SwipeDirectionCallback? onSwiped;
   final ConfirmSwipeCallback? confirmSwipe;
   final Duration? resizeDuration;
-  final Map<SwipeDirection, double> swipeThresholds;
+  final Map<SwipeType, double> swipeThresholds;
   final Duration movementDuration;
   final double crossAxisEndOffset;
   final DragStartBehavior dragStartBehavior;
@@ -159,7 +159,7 @@ class _SwipeableState extends State<Swipeable>
       return;
     }
 
-    if (_swipeDirection == SwipeDirection.right) {
+    if (_moveController!.value < _kSwipeThreshold) {
       _moveController!.reverse();
     }
     _handleMoveCompleted();
