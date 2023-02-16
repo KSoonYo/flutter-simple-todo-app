@@ -48,7 +48,7 @@ class _TodoInputState extends State<TodoInput> {
         controller: _controller,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
-        style: Theme.of(context).primaryTextTheme.headlineLarge,
+        style: Theme.of(context).textTheme.headlineLarge,
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
