@@ -20,23 +20,6 @@ enum SwipeDirection { left, right, up, down, none }
 enum SwipeType { short, long, none }
 
 class Swipeable extends StatefulWidget {
-<<<<<<< HEAD
-  const Swipeable({
-    super.key,
-    required this.child,
-    this.onUpdate,
-    this.onResize,
-    this.onSwiped,
-    this.confirmSwipe,
-    this.background,
-    this.resizeDuration = const Duration(milliseconds: 300),
-    this.swipeThresholds = const <SwipeType, double>{},
-    this.movementDuration = const Duration(milliseconds: 200),
-    this.crossAxisEndOffset = 0.0,
-    this.dragStartBehavior = DragStartBehavior.start,
-    this.behavior = HitTestBehavior.opaque,
-  });
-=======
   const Swipeable(
       {required super.key,
       required this.child,
@@ -51,7 +34,6 @@ class Swipeable extends StatefulWidget {
       this.crossAxisEndOffset = 0.0,
       this.dragStartBehavior = DragStartBehavior.start,
       this.behavior = HitTestBehavior.opaque});
->>>>>>> fed2092 (chore: remove unnecessary print statement and fix _handleSwipeUpdateValueChanged())
 
   final Widget child;
   final SwipeUpdateCallback? onUpdate;
