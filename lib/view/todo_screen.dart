@@ -25,7 +25,7 @@ class TodoScreen extends StatelessWidget {
               isScrollControlled: true,
               useSafeArea: true),
           child: TodoList(
-            list: model.active,
+            list: model.list,
             onReorder: model.moveItem,
           ),
         ),

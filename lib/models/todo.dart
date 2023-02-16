@@ -3,50 +3,45 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 
 class TodoModel with ChangeNotifier {
-  final _active = <Todo>[
+  final _list = <Todo>[
     const Todo('Pull down to add'),
     const Todo('Swipe left to remove'),
     const Todo('Swipe right to mark completed'),
     const Todo('Pull up to sham 🫠'),
   ];
 
-  final _archived = <Todo>[];
-
-  UnmodifiableListView<Todo> get active => UnmodifiableListView(_active);
-  UnmodifiableListView<Todo> get archived => UnmodifiableListView(_archived);
-
-  bool get isEmpty => _active.isEmpty && _archived.isEmpty;
+  UnmodifiableListView<Todo> get list => UnmodifiableListView(_list);
 
   void addItem(String content) {
-    _active.add(Todo(content));
+    _list.add(Todo(content));
     notifyListeners();
   }
 
   void removeItem({required Todo item}) {
-    if (_active.contains(item)) {
-      _active.remove(item);
-    } else {
-      _archived.remove(item);
-    }
+    _list.remove(item);
     notifyListeners();
   }
 
-  void archiveItem({required Todo item, required int index}) {
-    _active[index] = _active[index].copyWith(archived: true);
-    _archived.add(item.copyWith(archived: true));
+  void archiveItem({required Todo item}) {
+    final index = _list.indexOf(item);
+    if (index == -1) return;
+
+    _list[index] = item.copyWith(archived: true);
     notifyListeners();
   }
 
-  void unarchiveItem({required Todo item, required int index}) {
-    _active[index] = _active[index].copyWith(archived: false);
-    _archived.remove(item);
+  void unarchiveItem({required Todo item}) {
+    final index = _list.indexOf(item);
+    if (index == -1) return;
+
+    _list[index] = item.copyWith(archived: false);
     notifyListeners();
   }
 
   void moveItem(int from, int to) {
-    final item = _active.removeAt(from);
+    final item = _list.removeAt(from);
     if (from < to) to--;
-    _active.insert(to, item);
+    _list.insert(to, item);
     notifyListeners();
   }
 }
