@@ -31,15 +31,15 @@ class TodoModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void archiveItem({required Todo item}) {
-    _active.remove(item);
+  void archiveItem({required Todo item, required int index}) {
+    _active[index] = _active[index].copyWith(archived: true);
     _archived.add(item.copyWith(archived: true));
     notifyListeners();
   }
 
-  void unarchiveItem({required Todo item}) {
+  void unarchiveItem({required Todo item, required int index}) {
+    _active[index] = _active[index].copyWith(archived: false);
     _archived.remove(item);
-    _active.add(item.copyWith(archived: false));
     notifyListeners();
   }
 
