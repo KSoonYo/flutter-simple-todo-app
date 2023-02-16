@@ -80,3 +80,9 @@ class SettingsModel with ChangeNotifier {
     notifyListeners();
   }
 }
+
+enum FontSize {
+  small,
+  medium,
+  large;
+}

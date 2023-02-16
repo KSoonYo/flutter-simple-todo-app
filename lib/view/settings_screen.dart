@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/settings.dart';
-import 'color_picker_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -10,57 +9,94 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SettingsModel model = context.watch<SettingsModel>();
-    final Color color = model.color ?? Colors.white;
 
     return Scaffold(
       appBar: AppBar(),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            title: const Text('Theme'),
-            trailing: SegmentedButton<ThemeMode>(
-              segments: <ButtonSegment<ThemeMode>>[
-                for (var themeMode in ThemeMode.values)
-                  ButtonSegment(
-                    value: themeMode,
-                    label: Text(
-                      themeMode.name.capitalize(),
-                    ),
-                  ),
-              ],
-              showSelectedIcon: false,
-              selected: {model.themeMode},
-              onSelectionChanged: (selected) {
-                model.themeMode = selected.first;
-              },
+      body: Center(
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            const SizedBox(
+              height: 72,
+              child: ListTile(title: Text('Theme')),
             ),
-          ),
-          ListTile(
-            title: const Text('Color'),
-            trailing: ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => ColorPickerDialog(
-                    initialColor: color,
-                    onPick: (color) => model.color = color,
-                  ),
-                );
-              },
-              child: SizedBox.square(
-                dimension: 20.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: color,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.onPrimary,
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+              child: SegmentedButton<ThemeMode>(
+                segments: <ButtonSegment<ThemeMode>>[
+                  for (var themeMode in ThemeMode.values)
+                    ButtonSegment(
+                      value: themeMode,
+                      label: Text(
+                        themeMode.name.capitalize(),
+                      ),
                     ),
+                ],
+                showSelectedIcon: true,
+                selected: {model.themeMode},
+                onSelectionChanged: (selected) {
+                  model.themeMode = selected.first;
+                },
+              ),
+            ),
+            const SizedBox(
+              height: 72,
+              child: Center(
+                child: ListTile(title: Text('Font Color')),
+              ),
+            ),
+            const Placeholder(fallbackHeight: 72),
+            const SizedBox(
+              height: 72,
+              child: Center(
+                child: ListTile(title: Text('Font Size')),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+              child: SegmentedButton<FontSize>(
+                segments: <ButtonSegment<FontSize>>[
+                  for (var fontSize in FontSize.values)
+                    ButtonSegment(
+                      value: fontSize,
+                      label: Text(
+                        fontSize.name.capitalize(),
+                      ),
+                    ),
+                ],
+                showSelectedIcon: true,
+                selected: {FontSize.small},
+                onSelectionChanged: (selected) {
+                  // TODO
+                },
+              ),
+            ),
+            SizedBox(
+              height: 88,
+              child: Center(
+                child: ListTile(
+                  title: const Text('Sound'),
+                  trailing: Switch.adaptive(
+                    value: true,
+                    onChanged: (value) {},
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+            SizedBox(
+              height: 88,
+              child: Center(
+                child: ListTile(
+                  title: const Text('Haptic'),
+                  trailing: Switch.adaptive(
+                    value: true,
+                    onChanged: (value) {},
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
