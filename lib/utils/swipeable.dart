@@ -20,6 +20,7 @@ enum SwipeDirection { left, right, up, down, none }
 enum SwipeType { short, long, none }
 
 class Swipeable extends StatefulWidget {
+<<<<<<< HEAD
   const Swipeable({
     super.key,
     required this.child,
@@ -35,6 +36,22 @@ class Swipeable extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
     this.behavior = HitTestBehavior.opaque,
   });
+=======
+  const Swipeable(
+      {required super.key,
+      required this.child,
+      this.onUpdate,
+      this.onResize,
+      this.onSwiped,
+      this.confirmSwipe,
+      this.background,
+      this.resizeDuration = const Duration(milliseconds: 300),
+      this.swipeThresholds = const <SwipeType, double>{},
+      this.movementDuration = const Duration(milliseconds: 200),
+      this.crossAxisEndOffset = 0.0,
+      this.dragStartBehavior = DragStartBehavior.start,
+      this.behavior = HitTestBehavior.opaque});
+>>>>>>> fed2092 (chore: remove unnecessary print statement and fix _handleSwipeUpdateValueChanged())
 
   final Widget child;
   final SwipeUpdateCallback? onUpdate;
@@ -138,11 +155,10 @@ class _SwipeableState extends State<Swipeable>
 
     final double delta = details.primaryDelta!;
     final double oldDragExtent = _dragExtent;
-
     _dragExtent += delta;
 
-    if (_swipeDirection == SwipeDirection.right) return;
-    if (oldDragExtent.sign != _dragExtent.sign) {
+    if (oldDragExtent.sign != _dragExtent.sign &&
+        _swipeDirection != SwipeDirection.right) {
       setState(() {
         _updateMoveAnimation();
       });
@@ -152,7 +168,7 @@ class _SwipeableState extends State<Swipeable>
     }
   }
 
-  void _hanldeDragEnd(DragEndDetails details) {
+  void _handleDragEnd(DragEndDetails details) {
     if (!_isActive || _moveController!.isAnimating) return;
     _dragUnderway = false;
     if (_moveController!.isCompleted) {
@@ -171,7 +187,10 @@ class _SwipeableState extends State<Swipeable>
       _moveController!.reverse();
       return;
     }
-    print('swipe Direction check: $_swipeDirection in _handleMoveCompleted()');
+    if (_swipeDirection == SwipeDirection.right) {
+      widget.onSwiped?.call(_swipeDirection);
+      return;
+    }
     final bool result = await _confirmStartResizeAnimation();
     if (mounted) {
       if (result) {
@@ -186,9 +205,14 @@ class _SwipeableState extends State<Swipeable>
     final SwipeType oldSwipeThresholdReached = _swipeThresholdReached;
     if (widget.onUpdate != null) {
       late final SwipeUpdateDetails details;
-      if (widget.swipeThresholds[_swipeDirection] == null) {
-        _swipeThresholdReached = SwipeType.none;
-      } else if (_moveController!.value > _kSwipeThreshold) {
+      // if (widget.swipeThresholds[_swipeDirection] == null) {
+      //   _swipeThresholdReached = SwipeType.none;
+      // } else if (_moveController!.value > _kSwipeThreshold) {
+      //   _swipeThresholdReached = SwipeType.long;
+      // } else {
+      //   _swipeThresholdReached = SwipeType.short;
+      // }
+      if (_moveController!.value > _kSwipeThreshold) {
         _swipeThresholdReached = SwipeType.long;
       } else {
         _swipeThresholdReached = SwipeType.short;
@@ -207,9 +231,6 @@ class _SwipeableState extends State<Swipeable>
     } else {
       _swipeThresholdReached = SwipeType.short;
     }
-
-    print(
-        'now Swipe Type: $_swipeThresholdReached in  _handleSwipeUpdateValueChanged()');
   }
 
   void _updateMoveAnimation() {
@@ -234,8 +255,6 @@ class _SwipeableState extends State<Swipeable>
     _confirming = true;
     final SwipeDirection direction = _swipeDirection;
     final SwipeType swipeType = _swipeThresholdReached;
-    print('SwipeDirection: $direction in _confirmStartResizeAnimation()');
-    print('SwipeType: $swipeType in _confirmStartResizeAnimation()');
 
     try {
       if (widget.confirmSwipe != null) {
@@ -259,6 +278,7 @@ class _SwipeableState extends State<Swipeable>
     } else {
       _resizeController =
           AnimationController(duration: widget.resizeDuration, vsync: this)
+            ..addListener(_handleResizeProgressChanged)
             ..addStatusListener((AnimationStatus status) => updateKeepAlive());
       _resizeController!.forward();
       setState(() {
@@ -276,6 +296,14 @@ class _SwipeableState extends State<Swipeable>
               ),
             );
       });
+    }
+  }
+
+  void _handleResizeProgressChanged() {
+    if (_resizeController!.isCompleted) {
+      widget.onSwiped?.call(_swipeDirection);
+    } else {
+      widget.onResize?.call();
     }
   }
 
@@ -303,7 +331,7 @@ class _SwipeableState extends State<Swipeable>
     return GestureDetector(
       onHorizontalDragStart: _hanldeDragStart,
       onHorizontalDragUpdate: _handleDragUpdate,
-      onHorizontalDragEnd: _hanldeDragEnd,
+      onHorizontalDragEnd: _handleDragEnd,
       behavior: widget.behavior,
       dragStartBehavior: widget.dragStartBehavior,
       child: content,
