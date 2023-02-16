@@ -122,12 +122,14 @@ class _TodoInputRoute extends PopupRoute {
 
     return Scaffold(
       body: SafeArea(
-        child: TodoInput(
-          onSubmit: (value) {
-            model.addItem(value);
-            Navigator.pop(context);
-          },
-          // onCancel: () => Navigator.pop(context),
+        child: Center(
+          child: TodoInput(
+            onSubmit: (value) {
+              model.addItem(value);
+              Navigator.pop(context);
+            },
+            // onCancel: () => Navigator.pop(context),
+          ),
         ),
       ),
     );
