@@ -25,7 +25,6 @@ class SimpleTodoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsModel>();
     final themeMode = settings.themeMode;
-    final color = settings.color;
 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
@@ -33,17 +32,11 @@ class SimpleTodoApp extends StatelessWidget {
           title: 'Nothing To Do',
           theme: ThemeData(
             useMaterial3: true,
-            brightness: Brightness.light,
-            colorSchemeSeed: color,
-            colorScheme: color == null ? lightDynamic : null,
-            platform: TargetPlatform.android,
+            colorScheme: lightDynamic,
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
-            brightness: Brightness.dark,
-            colorSchemeSeed: color,
-            colorScheme: color == null ? darkDynamic : null,
-            platform: TargetPlatform.android,
+            colorScheme: darkDynamic,
           ),
           themeMode: themeMode,
           home: const TodoScreen(),

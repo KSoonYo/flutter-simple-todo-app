@@ -65,9 +65,9 @@ class SettingsScreen extends StatelessWidget {
                     ),
                 ],
                 showSelectedIcon: true,
-                selected: {FontSize.small},
+                selected: {model.fontSize},
                 onSelectionChanged: (selected) {
-                  // TODO
+                  model.fontSize = selected.first;
                 },
               ),
             ),
@@ -76,6 +76,9 @@ class SettingsScreen extends StatelessWidget {
               child: Center(
                 child: ListTile(
                   title: const Text('Sound'),
+                  subtitle: const Text(
+                    'Enable or disable sound on app actions',
+                  ),
                   trailing: Switch.adaptive(
                     value: true,
                     onChanged: (value) {},
@@ -88,6 +91,9 @@ class SettingsScreen extends StatelessWidget {
               child: Center(
                 child: ListTile(
                   title: const Text('Haptic'),
+                  subtitle: const Text(
+                    'Enable or disable tactile feedbacks for app actions',
+                  ),
                   trailing: Switch.adaptive(
                     value: true,
                     onChanged: (value) {},
