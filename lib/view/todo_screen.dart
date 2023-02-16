@@ -9,42 +9,8 @@ import 'package:simple_todo/view/todo_input.dart';
 import '../models/todo.dart';
 import 'todo_item.dart';
 
-class TodoScreen extends StatefulWidget {
+class TodoScreen extends StatelessWidget {
   const TodoScreen({super.key});
-
-  @override
-  State<TodoScreen> createState() => _TodoScreenState();
-}
-
-class _TodoScreenState extends State<TodoScreen> {
-  var _editing = false;
-  late FocusNode _focusNode;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _focusNode = FocusNode();
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-
-    super.dispose();
-  }
-
-  void _setEditing(bool value) {
-    if (value) {
-      _focusNode.requestFocus();
-    } else {
-      _focusNode.unfocus();
-    }
-
-    setState(() {
-      _editing = value;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,53 +18,19 @@ class _TodoScreenState extends State<TodoScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: [
-            VerticalSwiper(
-              onPullDown: () => _setEditing(true),
-              onPullUp: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                  fullscreenDialog: true,
-                ),
-              ),
-              child: TodoList(
-                list: model.active,
-                onReorder: model.moveItem,
-              ),
-            ),
-            AnimatedOpacity(
-              opacity: _editing ? 1 : 0,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.fastLinearToSlowEaseIn,
-              child: Stack(
-                children: [
-                  if (_editing)
-                    ModalBarrier(
-                      color: Theme.of(context).dialogBackgroundColor,
-                      onDismiss: () => _setEditing(false),
-                    ),
-                  AnimatedSlide(
-                    offset: _editing ? const Offset(0, 0) : const Offset(0, -1),
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.fastLinearToSlowEaseIn,
-                    child: Column(
-                      children: [
-                        TodoInput(
-                          onSubmit: (value) {
-                            model.addItem(value);
-                            _setEditing(false);
-                          },
-                          focusNode: _focusNode,
-                          onCancel: () => _setEditing(false),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        child: VerticalSwiper(
+          onPullDown: () => Navigator.of(context).push(
+            _TodoInputRoute(),
+          ),
+          onPullUp: () => showModalBottomSheet(
+              context: context,
+              builder: (context) => const SettingsScreen(),
+              isScrollControlled: true,
+              useSafeArea: true),
+          child: TodoList(
+            list: model.active,
+            onReorder: model.moveItem,
+          ),
         ),
       ),
     );
@@ -168,4 +100,54 @@ class TodoList extends StatelessWidget {
       ),
     );
   }
+}
+
+class _TodoInputRoute extends PopupRoute {
+  @override
+  Color? get barrierColor => const Color.fromRGBO(0, 0, 0, 0.5);
+
+  @override
+  bool get barrierDismissible => true;
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    final model = context.read<TodoModel>();
+
+    return Scaffold(
+      body: SafeArea(
+        child: TodoInput(
+          onSubmit: (value) {
+            model.addItem(value);
+            Navigator.pop(context);
+          },
+          // onCancel: () => Navigator.pop(context),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return AnimatedSlide(
+      offset: Offset(0, -0.5 + animation.value / 2),
+      duration: transitionDuration,
+      curve: Curves.fastLinearToSlowEaseIn,
+      child: child,
+    );
+  }
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 200);
 }
