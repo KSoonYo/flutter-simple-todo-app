@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:simple_todo/utils/swipeable.dart';
 
 import '../models/todo.dart';
 
@@ -12,13 +14,24 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        item.content,
-        style: Theme.of(context).textTheme.headlineLarge,
-        maxLines: 1,
+    final model = context.read<TodoModel>();
+
+    return Swipeable(
+      onSwiped: (swipeDirection) {
+        if (swipeDirection == SwipeDirection.right) {
+          model.archiveItem(item: item);
+        } else if (swipeDirection == SwipeDirection.left) {
+          model.removeItem(item: item);
+        }
+      },
+      child: ListTile(
+        title: Text(
+          item.content,
+          style: Theme.of(context).textTheme.headlineLarge,
+          maxLines: 1,
+        ),
+        onTap: () => context.showSnackBar('Toasty!'),
       ),
-      onTap: () => context.showSnackBar('Toasty!'),
     );
   }
 }
