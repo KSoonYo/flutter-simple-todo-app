@@ -20,20 +20,21 @@ enum SwipeDirection { left, right, up, down, none }
 enum SwipeType { short, long, none }
 
 class Swipeable extends StatefulWidget {
-  const Swipeable(
-      {required super.key,
-      required this.child,
-      this.onUpdate,
-      this.onResize,
-      this.onSwiped,
-      this.confirmSwipe,
-      this.background,
-      this.resizeDuration = const Duration(milliseconds: 300),
-      this.swipeThresholds = const <SwipeType, double>{},
-      this.movementDuration = const Duration(milliseconds: 200),
-      this.crossAxisEndOffset = 0.0,
-      this.dragStartBehavior = DragStartBehavior.start,
-      this.behavior = HitTestBehavior.opaque});
+  const Swipeable({
+    super.key,
+    required this.child,
+    this.onUpdate,
+    this.onResize,
+    this.onSwiped,
+    this.confirmSwipe,
+    this.background,
+    this.resizeDuration = const Duration(milliseconds: 300),
+    this.swipeThresholds = const <SwipeType, double>{},
+    this.movementDuration = const Duration(milliseconds: 200),
+    this.crossAxisEndOffset = 0.0,
+    this.dragStartBehavior = DragStartBehavior.start,
+    this.behavior = HitTestBehavior.opaque,
+  });
 
   final Widget child;
   final SwipeUpdateCallback? onUpdate;
