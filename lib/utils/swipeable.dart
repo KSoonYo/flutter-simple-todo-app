@@ -140,8 +140,12 @@ class _SwipeableState extends State<Swipeable>
     final double oldDragExtent = _dragExtent;
     _dragExtent += delta;
 
-    if (oldDragExtent.sign != _dragExtent.sign &&
-        _swipeDirection != SwipeDirection.right) {
+    if (_swipeDirection == SwipeDirection.right ||
+        _swipeDirection == SwipeDirection.none) {
+      _dragExtent = 0;
+    }
+
+    if (oldDragExtent.sign != _dragExtent.sign) {
       setState(() {
         _updateMoveAnimation();
       });
