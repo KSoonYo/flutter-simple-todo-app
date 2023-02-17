@@ -1,10 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/gestures.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 const Curve _kResizeTimeCurve = Interval(0.4, 1.0, curve: Curves.ease);
-const double _kSwipeThreshold = 0.4;
+const double _kSwipeThreshold = 0.3;
+const double _kLongSwipeThreshold = 0.5;
+const double _kShortSwipeThreshold = 0.2;
 
 // used by onSwiped
 typedef SwipeDirectionCallback = void Function(SwipeDirection swipeDirection);
@@ -28,6 +30,7 @@ class Swipeable extends StatefulWidget {
     this.onSwiped,
     this.confirmSwipe,
     this.background,
+    this.icons,
     this.resizeDuration = const Duration(milliseconds: 300),
     this.swipeThresholds = const <SwipeType, double>{},
     this.movementDuration = const Duration(milliseconds: 200),
@@ -48,6 +51,7 @@ class Swipeable extends StatefulWidget {
   final DragStartBehavior dragStartBehavior;
   final HitTestBehavior behavior;
   final Widget? background;
+  final List<TrailingIconButton>? icons;
 
   @override
   State<Swipeable> createState() => _SwipeableState();
@@ -62,6 +66,42 @@ class SwipeUpdateDetails {
   final SwipeDirection direction;
   final SwipeType reached;
   final SwipeType previousReached;
+}
+
+class TrailingIconButton {
+  TrailingIconButton(
+      {required this.icon, this.onPressed, this.isRemained = true});
+
+  final bool isRemained;
+  final Icon icon;
+  final void Function()? onPressed;
+}
+
+class _SwipeableClipper extends CustomClipper<Rect> {
+  _SwipeableClipper({
+    required this.axis,
+    required this.moveAnimation,
+  }) : super(reclip: moveAnimation);
+  final Axis axis;
+  final Animation<Offset> moveAnimation;
+
+  @override
+  Rect getClip(Size size) {
+    final double offset = moveAnimation.value.dx * size.width;
+    if (offset < 0) {
+      return Rect.fromLTRB(size.width + offset, 0.0, size.width, size.height);
+    }
+    return Rect.fromLTRB(0.0, 0.0, offset, size.height);
+  }
+
+  @override
+  Rect getApproximateClipRect(Size size) => getClip(size);
+
+  @override
+  bool shouldReclip(_SwipeableClipper oldClipper) {
+    return oldClipper.axis != axis ||
+        oldClipper.moveAnimation.value != moveAnimation.value;
+  }
 }
 
 class _SwipeableState extends State<Swipeable>
@@ -95,6 +135,7 @@ class _SwipeableState extends State<Swipeable>
   Animation<double>? _resizeAnimation;
 
   double _dragExtent = 0.0;
+  double _oldDragExtent = 0.0;
   bool _confirming = false;
   bool _dragUnderway = false;
   Size? _sizePriorToCollapse;
@@ -123,6 +164,8 @@ class _SwipeableState extends State<Swipeable>
       _dragExtent =
           _moveController!.value * _overallDragExtent * _dragExtent.sign;
       _moveController!.stop();
+    } else if (_oldDragExtent.abs() > 0) {
+      _dragExtent = _oldDragExtent;
     } else {
       _dragExtent = 0.0;
       _moveController!.value = 0.0;
@@ -140,37 +183,58 @@ class _SwipeableState extends State<Swipeable>
     final double oldDragExtent = _dragExtent;
     _dragExtent += delta;
 
-    if (_swipeDirection == SwipeDirection.right ||
-        _swipeDirection == SwipeDirection.none) {
+    if (_swipeDirection == SwipeDirection.none) return;
+
+    if (_swipeDirection != SwipeDirection.right) {
+      _moveController!.value = _dragExtent.abs() / _overallDragExtent;
+    } else {
+      // turn
       _dragExtent = 0;
     }
+    setState(() {
+      _updateMoveAnimation();
+    });
 
-    if (oldDragExtent.sign != _dragExtent.sign) {
-      setState(() {
-        _updateMoveAnimation();
-      });
-    }
-    if (!_moveController!.isAnimating) {
-      _moveController!.value = _dragExtent.abs() / _overallDragExtent;
-    }
+    // if (oldDragExtent.sign != _dragExtent.sign) {
+    // }
   }
 
   void _handleDragEnd(DragEndDetails details) {
     if (!_isActive || _moveController!.isAnimating) return;
     _dragUnderway = false;
+    _oldDragExtent = _dragExtent;
     if (_moveController!.isCompleted) {
       _handleMoveCompleted();
       return;
     }
 
-    if (_moveController!.value < _kSwipeThreshold) {
-      _moveController!.reverse();
+    // TODO: short Swipe threshold, long Swipe threshold 분기 방어 코드 필
+    // short에 걸리는 경우 stop(), long에 걸리는 경우 삭제 swipe & reszie animation
+
+    // if (!_moveController!.isDismissed) {
+    //   if (_moveController!.value < _kSwipeThreshold) {
+    //     _moveController!.reverse();
+    //   } else {
+    //     _moveController!.forward();
+    //   }
+    // }
+
+    // TODO: short Swipe threshold, long Swipe threshold 분기 방어 코드 필
+    // short에 걸리는 경우 stop(), long에 걸리는 경우 삭제 swipe & reszie animation
+
+    if (_swipeThresholdReached == SwipeType.short) {
+      _moveController!.stop();
+    } else {
+      _moveController!.forward();
     }
-    _handleMoveCompleted();
+    setState(() {
+      _updateMoveAnimation();
+    });
   }
 
   Future<void> _handleMoveCompleted() async {
-    if ((widget.swipeThresholds[_swipeDirection] ?? _kSwipeThreshold) >= 1.0) {
+    if ((widget.swipeThresholds[_swipeThresholdReached] ?? _kSwipeThreshold) >=
+        1.0) {
       _moveController!.reverse();
       return;
     }
@@ -190,33 +254,33 @@ class _SwipeableState extends State<Swipeable>
 
   void _handleSwipeUpdateValueChanged() {
     final SwipeType oldSwipeThresholdReached = _swipeThresholdReached;
+    SwipeType newSwipeThresholdReached = SwipeType.none;
+    // print('now swipeType: $_swipeThresholdReached');
+    // if (widget.swipeThresholds[_swipeDirection] == null) {
+    //   _swipeThresholdReached = SwipeType.none;
+    // } else if (_moveController!.value > _kSwipeThreshold) {
+    //   _swipeThresholdReached = SwipeType.long;
+    // } else {
+    //   _swipeThresholdReached = SwipeType.short;
+    // }
+
+    if (_moveController!.value > _kLongSwipeThreshold) {
+      newSwipeThresholdReached = SwipeType.long;
+    } else {
+      newSwipeThresholdReached = SwipeType.short;
+    }
+
     if (widget.onUpdate != null) {
       late final SwipeUpdateDetails details;
-      // if (widget.swipeThresholds[_swipeDirection] == null) {
-      //   _swipeThresholdReached = SwipeType.none;
-      // } else if (_moveController!.value > _kSwipeThreshold) {
-      //   _swipeThresholdReached = SwipeType.long;
-      // } else {
-      //   _swipeThresholdReached = SwipeType.short;
-      // }
-      if (_moveController!.value > _kSwipeThreshold) {
-        _swipeThresholdReached = SwipeType.long;
-      } else {
-        _swipeThresholdReached = SwipeType.short;
-      }
-
       details = SwipeUpdateDetails(
           direction: _swipeDirection,
           reached: _swipeThresholdReached,
           previousReached: oldSwipeThresholdReached);
       widget.onUpdate!(details);
-      return;
-    }
-
-    if (_moveController!.value > _kSwipeThreshold) {
-      _swipeThresholdReached = SwipeType.long;
     } else {
-      _swipeThresholdReached = SwipeType.short;
+      setState(() {
+        _swipeThresholdReached = newSwipeThresholdReached;
+      });
     }
   }
 
@@ -294,10 +358,61 @@ class _SwipeableState extends State<Swipeable>
     }
   }
 
+  List? get iconButtons => _getIconButtons();
+
+  List? _getIconButtons() {
+    if (widget.icons == null) {
+      return null;
+    }
+    List _lists = [];
+    for (int i = 0; i < widget.icons!.length; i++) {
+      var iconData = _swipeThresholdReached == SwipeType.long
+          ? widget.icons![i]
+          : widget.icons!.reversed.toList()[i];
+
+      // TODO: moveController value가 short 초과 long 미만인 상태라면 short 상태 포지셔닝 유지
+      _lists.add(Positioned(
+        right: _dragExtent.abs() * _moveController!.value * i,
+        child: Visibility(
+          visible:
+              _swipeThresholdReached == SwipeType.short || iconData.isRemained,
+          child: IconButton(
+            icon: iconData.icon,
+            onPressed: iconData.onPressed,
+          ),
+        ),
+      ));
+    }
+    // for (final iconData in widget.icons!) {
+    //   _lists.add(Positioned(
+    //     right: _dragExtent.abs() * _moveController!.value,
+    //     child: Visibility(
+    //       visible:
+    //           _swipeThresholdReached == SwipeType.short || iconData.isRemained,
+    //       child: IconButton(
+    //         icon: iconData.icon,
+    //         onPressed: iconData.onPressed,
+    //       ),
+    //     ),
+    //   ));
+    // }
+    return _lists;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     Widget? background = widget.background;
+
+    // TODO: background container가 있는 경우, 아이콘 처리
+    if (widget.icons != null) {
+      background ??= Stack(
+        alignment: AlignmentDirectional.centerEnd,
+        children: [
+          ...?iconButtons,
+        ],
+      );
+    }
 
     if (_resizeAnimation != null) {
       return SizeTransition(
@@ -314,6 +429,20 @@ class _SwipeableState extends State<Swipeable>
       position: _moveAnimation,
       child: widget.child,
     );
+
+    if (background != null) {
+      content = Stack(
+        children: <Widget>[
+          Positioned.fill(
+              child: ClipRect(
+            clipper: _SwipeableClipper(
+                axis: Axis.horizontal, moveAnimation: _moveAnimation),
+            child: background,
+          )),
+          content
+        ],
+      );
+    }
 
     return GestureDetector(
       onHorizontalDragStart: _hanldeDragStart,
