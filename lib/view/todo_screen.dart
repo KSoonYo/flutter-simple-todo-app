@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_todo/view/settings_screen.dart';
-import 'package:simple_todo/view/todo_input.dart';
 
 import '../models/todo.dart';
+import 'todo_input_screen.dart';
 import 'todo_list.dart';
+import 'vertical_pullable.dart';
 
 class TodoScreen extends StatelessWidget {
   const TodoScreen({super.key});
@@ -15,9 +16,9 @@ class TodoScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: VerticalSwiper(
-          onPullDown: () => Navigator.of(context).push(
-            _TodoInputRoute(),
+        child: VerticalPullable(
+          onPullDown: () => showTodoInput(
+            context: context,
           ),
           onPullUp: () => showModalBottomSheet(
               context: context,
@@ -32,90 +33,22 @@ class TodoScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-class VerticalSwiper extends StatelessWidget {
-  const VerticalSwiper({
-    super.key,
-    this.onPullDown,
-    this.onPullUp,
-    required this.child,
-  });
-
-  final void Function()? onPullDown;
-  final void Function()? onPullUp;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onVerticalDragEnd: onPullDown != null || onPullUp != null
-          ? (details) {
-              final velocity = details.primaryVelocity;
-
-              if (velocity == null || velocity.abs() < 400) return;
-
-              if (velocity > 0) {
-                onPullDown?.call();
-              } else {
-                onPullUp?.call();
-              }
-            }
-          : null,
-      child: child,
-    );
-  }
-}
-
-class _TodoInputRoute extends PopupRoute {
-  @override
-  Color? get barrierColor => const Color.fromRGBO(0, 0, 0, 0.5);
-
-  @override
-  bool get barrierDismissible => true;
-
-  @override
-  String? get barrierLabel => null;
-
-  @override
-  Widget buildPage(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-  ) {
-    final model = context.read<TodoModel>();
-
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: TodoInput(
-            onSubmit: (value) {
-              model.addItem(value);
-              Navigator.pop(context);
-            },
-            // onCancel: () => Navigator.pop(context),
-          ),
-        ),
+  Future<T?> showTodoInput<T>({required BuildContext context}) {
+    return Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) {
+          return const TodoInputScreen();
+        },
+        transitionsBuilder: (_, animation, ___, child) {
+          return AnimatedSlide(
+            offset: Offset(0, -1 + animation.value),
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.fastLinearToSlowEaseIn,
+            child: child,
+          );
+        },
       ),
     );
   }
-
-  @override
-  Widget buildTransitions(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    return AnimatedSlide(
-      offset: Offset(0, -0.5 + animation.value / 2),
-      duration: transitionDuration,
-      curve: Curves.fastLinearToSlowEaseIn,
-      child: child,
-    );
-  }
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 200);
 }
