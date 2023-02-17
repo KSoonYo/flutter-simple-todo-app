@@ -28,10 +28,13 @@ class TodoItem extends StatelessWidget {
         }
       },
       child: ListTile(
-        title: Text(
-          item.content,
-          style: _getTextStyle(context, fontSize),
-          maxLines: 1,
+        title: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            item.content,
+            style: _getTextStyle(context, fontSize),
+            maxLines: 2,
+          ),
         ),
         onTap: () => context.showSnackBar('Toasty!'),
       ),

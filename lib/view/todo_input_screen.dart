@@ -15,8 +15,7 @@ class TodoInputScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Container(
-          alignment: Alignment.bottomCenter,
+        child: Center(
           child: TodoInput(
             onSubmit: (value) {
               value = value.trim();
