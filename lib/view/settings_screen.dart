@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../models/settings.dart';
@@ -9,6 +10,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SettingsModel model = context.watch<SettingsModel>();
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(),
@@ -16,9 +18,9 @@ class SettingsScreen extends StatelessWidget {
         child: ListView(
           shrinkWrap: true,
           children: <Widget>[
-            const SizedBox(
+            SizedBox(
               height: 72,
-              child: ListTile(title: Text('Theme')),
+              child: ListTile(title: Text(t.settingsTheme)),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
@@ -27,9 +29,7 @@ class SettingsScreen extends StatelessWidget {
                   for (var themeMode in ThemeMode.values)
                     ButtonSegment(
                       value: themeMode,
-                      label: Text(
-                        themeMode.name.capitalize(),
-                      ),
+                      label: Text(t.getSettingsTheme(themeMode)),
                     ),
                 ],
                 showSelectedIcon: true,
@@ -39,17 +39,17 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(
+            SizedBox(
               height: 72,
               child: Center(
-                child: ListTile(title: Text('Font Color')),
+                child: ListTile(title: Text(t.settingsFontColor)),
               ),
             ),
             const Placeholder(fallbackHeight: 72),
-            const SizedBox(
+            SizedBox(
               height: 72,
               child: Center(
-                child: ListTile(title: Text('Font Size')),
+                child: ListTile(title: Text(t.settingsFontSize)),
               ),
             ),
             Padding(
@@ -59,9 +59,7 @@ class SettingsScreen extends StatelessWidget {
                   for (var fontSize in FontSize.values)
                     ButtonSegment(
                       value: fontSize,
-                      label: Text(
-                        fontSize.name.capitalize(),
-                      ),
+                      label: Text(t.getFontSize(fontSize)),
                     ),
                 ],
                 showSelectedIcon: true,
@@ -75,10 +73,8 @@ class SettingsScreen extends StatelessWidget {
               height: 88,
               child: Center(
                 child: ListTile(
-                  title: const Text('Sound'),
-                  subtitle: const Text(
-                    'Enable or disable sound on app actions',
-                  ),
+                  title: Text(t.settingsSound),
+                  subtitle: Text(t.settingsSoundSubtitle),
                   trailing: Switch.adaptive(
                     value: true,
                     onChanged: (value) {},
@@ -90,10 +86,8 @@ class SettingsScreen extends StatelessWidget {
               height: 88,
               child: Center(
                 child: ListTile(
-                  title: const Text('Haptic'),
-                  subtitle: const Text(
-                    'Enable or disable tactile feedbacks for app actions',
-                  ),
+                  title: Text(t.settingsHaptic),
+                  subtitle: Text(t.settingsHapticSubtitle),
                   trailing: Switch.adaptive(
                     value: true,
                     onChanged: (value) {},
@@ -105,6 +99,30 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+extension AppLocalizationsExtension on AppLocalizations {
+  String getSettingsTheme(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.system:
+        return settingsThemeSystem;
+      case ThemeMode.light:
+        return settingsThemeLight;
+      case ThemeMode.dark:
+        return settingsThemeDark;
+    }
+  }
+
+  String getFontSize(FontSize fontSize) {
+    switch (fontSize) {
+      case FontSize.small:
+        return settingsFontSizeSmall;
+      case FontSize.medium:
+        return settingsFontSizeMedium;
+      case FontSize.large:
+        return settingsFontSizeLarge;
+    }
   }
 }
 

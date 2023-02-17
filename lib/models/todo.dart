@@ -1,16 +1,26 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TodoModel with ChangeNotifier {
-  final _list = <Todo>[
-    const Todo('Pull down to add'),
-    const Todo('Swipe left to remove'),
-    const Todo('Swipe right to mark completed'),
-    const Todo('Pull up to sham 🫠'),
-  ];
+  late final List<Todo> _list;
+  var _initialized = false;
 
   UnmodifiableListView<Todo> get list => UnmodifiableListView(_list);
+
+  void initialize(AppLocalizations appLocalizations) {
+    if (_initialized) return;
+
+    _initialized = true;
+    _list = [
+      Todo(appLocalizations.todoDefaultItem1),
+      Todo(appLocalizations.todoDefaultItem2),
+      Todo(appLocalizations.todoDefaultItem3),
+      Todo(appLocalizations.todoDefaultItem4),
+      Todo(appLocalizations.todoDefaultItem5),
+    ];
+  }
 
   void addItem(String content) {
     _list.add(Todo(content));

@@ -19,7 +19,12 @@ class TodoInputScreen extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           child: TodoInput(
             onSubmit: (value) {
-              model.addItem(value);
+              value = value.trim();
+
+              if (value.isNotEmpty) {
+                model.addItem(value);
+              }
+
               Navigator.pop(context);
             },
             // onCancel: () => Navigator.pop(context),

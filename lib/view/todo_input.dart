@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TodoInput extends StatefulWidget {
   const TodoInput({
@@ -42,6 +43,8 @@ class _TodoInputState extends State<TodoInput> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: TextField(
@@ -52,7 +55,7 @@ class _TodoInputState extends State<TodoInput> {
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
-          hintText: "What's up?",
+          hintText: t.todoInputHint,
           suffixIcon: !_isEmpty
               ? IconButton(
                   onPressed: _controller.clear,

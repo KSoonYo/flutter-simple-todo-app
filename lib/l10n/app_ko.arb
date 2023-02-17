@@ -1,0 +1,21 @@
+{
+  "todoDefaultItem1": "👇아래로 스와이프하여 새 작업을 만들어 보세요.",
+  "todoDefaultItem2": "👉오른쪽으로 스와이프하여 내가 한 일을 완료 표시하세요.",
+  "todoDefaultItem3": "👈왼쪽으로 스와이프하여 할 일을 삭제/편집하세요.",
+  "todoDefaultItem4": "☝️할 일 목록을 길게 누르고 순서를 조정해 보세요.",
+  "todoDefaultItem5": "👆위로 스와이프하면 여러가지 설정을 할 수 있어요.",
+  "todoInputHint": "오늘 할 일",
+  "settingsTheme": "테마",
+  "settingsThemeSystem": "시스템",
+  "settingsThemeLight": "라이트",
+  "settingsThemeDark": "다크",
+  "settingsFontColor": "폰트 컬러",
+  "settingsFontSize": "폰트 사이즈",
+  "settingsFontSizeSmall": "작게",
+  "settingsFontSizeMedium": "중간",
+  "settingsFontSizeLarge": "크게",
+  "settingsSound": "사운드",
+  "settingsSoundSubtitle": "앱 동작 시 사운드 발생 유무를 설정하세요",
+  "settingsHaptic": "햅틱",
+  "settingsHapticSubtitle": "앱 동작 시 촉각 느낌 유무를 설정하세요"
+}

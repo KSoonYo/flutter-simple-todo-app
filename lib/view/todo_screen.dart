@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_todo/view/settings_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../models/todo.dart';
 import 'todo_input_screen.dart';
@@ -13,6 +14,7 @@ class TodoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.watch<TodoModel>();
+    model.initialize(AppLocalizations.of(context)!);
 
     return Scaffold(
       body: SafeArea(
