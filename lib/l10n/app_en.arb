@@ -5,15 +5,18 @@
   "todoDefaultItem4": "☝️Long press to reorder your to-do list.",
   "todoDefaultItem5": "👆Swipe up to adjust settings.",
   "todoInputHint": "What's next?",
-  "settingsTheme": "Theme",
-  "settingsThemeSystem": "System",
-  "settingsThemeLight": "Light",
-  "settingsThemeDark": "Dark",
+  "settingsThemeModeTitle": "Theme",
+  "settingsThemeModeValue": "{name, select, light{Light} dark{Dark} other{System} }",
+  "@settingsThemeModeValue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "settingsFontColor": "Font Color",
-  "settingsFontSize": "Font Size",
-  "settingsFontSizeSmall": "Small",
-  "settingsFontSizeMedium": "Medium",
-  "settingsFontSizeLarge": "Large",
+  "settingsFontSizeTitle": "Font Size",
+  "settingsFontSizeValue": "{name, select, small{Small} medium{Medium} large{Large} other{}}",
   "settingsSound": "Sound",
   "settingsSoundSubtitle": "Enable or disable sound on app actions",
   "settingsHaptic": "Haptic",

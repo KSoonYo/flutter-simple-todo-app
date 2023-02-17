@@ -20,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
           children: <Widget>[
             SizedBox(
               height: 72,
-              child: ListTile(title: Text(t.settingsTheme)),
+              child: ListTile(title: Text(t.settingsThemeModeTitle)),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
@@ -29,7 +29,7 @@ class SettingsScreen extends StatelessWidget {
                   for (var themeMode in ThemeMode.values)
                     ButtonSegment(
                       value: themeMode,
-                      label: Text(t.getSettingsTheme(themeMode)),
+                      label: Text(t.settingsThemeModeValue(themeMode.name)),
                     ),
                 ],
                 showSelectedIcon: true,
@@ -49,7 +49,7 @@ class SettingsScreen extends StatelessWidget {
             SizedBox(
               height: 72,
               child: Center(
-                child: ListTile(title: Text(t.settingsFontSize)),
+                child: ListTile(title: Text(t.settingsFontSizeTitle)),
               ),
             ),
             Padding(
@@ -59,7 +59,7 @@ class SettingsScreen extends StatelessWidget {
                   for (var fontSize in FontSize.values)
                     ButtonSegment(
                       value: fontSize,
-                      label: Text(t.getFontSize(fontSize)),
+                      label: Text(t.settingsFontSizeValue(fontSize.name)),
                     ),
                 ],
                 showSelectedIcon: true,
@@ -99,30 +99,6 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-extension AppLocalizationsExtension on AppLocalizations {
-  String getSettingsTheme(ThemeMode themeMode) {
-    switch (themeMode) {
-      case ThemeMode.system:
-        return settingsThemeSystem;
-      case ThemeMode.light:
-        return settingsThemeLight;
-      case ThemeMode.dark:
-        return settingsThemeDark;
-    }
-  }
-
-  String getFontSize(FontSize fontSize) {
-    switch (fontSize) {
-      case FontSize.small:
-        return settingsFontSizeSmall;
-      case FontSize.medium:
-        return settingsFontSizeMedium;
-      case FontSize.large:
-        return settingsFontSizeLarge;
-    }
   }
 }
 
