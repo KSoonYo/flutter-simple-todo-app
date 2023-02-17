@@ -7,18 +7,11 @@
   "todoInputHint": "What's next?",
   "settingsThemeModeTitle": "Theme",
   "settingsThemeModeValue": "{name, select, light{Light} dark{Dark} other{System} }",
-  "@settingsThemeModeValue": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "settingsFontColor": "Font Color",
+  "settingsFontColorTitle": "Font Color",
   "settingsFontSizeTitle": "Font Size",
   "settingsFontSizeValue": "{name, select, small{Small} medium{Medium} large{Large} other{}}",
-  "settingsSound": "Sound",
+  "settingsSoundTitle": "Sound",
   "settingsSoundSubtitle": "Enable or disable sound on app actions",
-  "settingsHaptic": "Haptic",
+  "settingsHapticTitle": "Haptic",
   "settingsHapticSubtitle": "Enable or disable tactile feedbacks for app actions"
 }

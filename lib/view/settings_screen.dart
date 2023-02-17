@@ -42,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
             SizedBox(
               height: 72,
               child: Center(
-                child: ListTile(title: Text(t.settingsFontColor)),
+                child: ListTile(title: Text(t.settingsFontColorTitle)),
               ),
             ),
             const Placeholder(fallbackHeight: 72),
@@ -73,7 +73,7 @@ class SettingsScreen extends StatelessWidget {
               height: 88,
               child: Center(
                 child: ListTile(
-                  title: Text(t.settingsSound),
+                  title: Text(t.settingsSoundTitle),
                   subtitle: Text(t.settingsSoundSubtitle),
                   trailing: Switch.adaptive(
                     value: true,
@@ -86,7 +86,7 @@ class SettingsScreen extends StatelessWidget {
               height: 88,
               child: Center(
                 child: ListTile(
-                  title: Text(t.settingsHaptic),
+                  title: Text(t.settingsHapticTitle),
                   subtitle: Text(t.settingsHapticSubtitle),
                   trailing: Switch.adaptive(
                     value: true,
