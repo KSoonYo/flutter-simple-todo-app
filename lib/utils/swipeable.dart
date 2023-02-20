@@ -138,6 +138,7 @@ class _SwipeableState extends State<Swipeable>
   double _oldDragExtent = 0.0;
   bool _confirming = false;
   bool _dragUnderway = false;
+  bool _isTurned = false;
   Size? _sizePriorToCollapse;
   SwipeType _swipeThresholdReached = SwipeType.none;
 
@@ -147,6 +148,9 @@ class _SwipeableState extends State<Swipeable>
   }
 
   SwipeDirection get _swipeDirection => _extendToDirection(_dragExtent);
+
+  SwipeDirection get _previousSwipeDirection =>
+      _extendToDirection(_oldDragExtent);
 
   bool get _isActive {
     return _dragUnderway || _moveController!.isAnimating;
@@ -160,11 +164,12 @@ class _SwipeableState extends State<Swipeable>
   void _hanldeDragStart(DragStartDetails details) {
     if (_confirming) return;
     _dragUnderway = true;
+    _isTurned = false;
     if (_moveController!.isAnimating) {
       _dragExtent =
           _moveController!.value * _overallDragExtent * _dragExtent.sign;
       _moveController!.stop();
-    } else if (_oldDragExtent.abs() > 0) {
+    } else if (_oldDragExtent.abs() > 0 && _moveController!.value.abs() > 0) {
       _dragExtent = _oldDragExtent;
     } else {
       _dragExtent = 0.0;
@@ -178,38 +183,36 @@ class _SwipeableState extends State<Swipeable>
 
   void _handleDragUpdate(DragUpdateDetails details) {
     if (!_isActive || _moveController!.isAnimating) return;
-
     final double delta = details.primaryDelta!;
-    final double oldDragExtent = _dragExtent;
+    _oldDragExtent = _dragExtent;
     _dragExtent += delta;
 
-    if (_swipeDirection == SwipeDirection.none) return;
-
-    if (_swipeDirection != SwipeDirection.right) {
-      _moveController!.value = _dragExtent.abs() / _overallDragExtent;
-    } else {
-      // turn
-      _dragExtent = 0;
+    if (_swipeDirection != SwipeDirection.none &&
+        _previousSwipeDirection != SwipeDirection.none &&
+        !_isTurned) {
+      _isTurned = _previousSwipeDirection != _swipeDirection;
     }
+
+    if (_swipeDirection == SwipeDirection.none) {
+      return;
+    }
+
+    if (_swipeDirection == SwipeDirection.right) {
+      _moveController!.value = 0.0;
+    } else {
+      _moveController!.value = _dragExtent.abs() / _overallDragExtent;
+    }
+
     setState(() {
       _updateMoveAnimation();
     });
-
-    // if (oldDragExtent.sign != _dragExtent.sign) {
-    // }
   }
 
   void _handleDragEnd(DragEndDetails details) {
     if (!_isActive || _moveController!.isAnimating) return;
     _dragUnderway = false;
-    _oldDragExtent = _dragExtent;
-    if (_moveController!.isCompleted) {
-      _handleMoveCompleted();
-      return;
-    }
 
-    // TODO: short Swipe threshold, long Swipe threshold 분기 방어 코드 필
-    // short에 걸리는 경우 stop(), long에 걸리는 경우 삭제 swipe & reszie animation
+    _handleMoveCompleted();
 
     // if (!_moveController!.isDismissed) {
     //   if (_moveController!.value < _kSwipeThreshold) {
@@ -238,7 +241,7 @@ class _SwipeableState extends State<Swipeable>
       _moveController!.reverse();
       return;
     }
-    if (_swipeDirection == SwipeDirection.right) {
+    if (!_isTurned && _swipeDirection == SwipeDirection.right) {
       widget.onSwiped?.call(_swipeDirection);
       return;
     }
@@ -246,7 +249,7 @@ class _SwipeableState extends State<Swipeable>
     if (mounted) {
       if (result) {
         _startResizeAnimation();
-      } else {
+      } else if (_moveController!.value < _kShortSwipeThreshold) {
         _moveController!.reverse();
       }
     }
@@ -255,7 +258,6 @@ class _SwipeableState extends State<Swipeable>
   void _handleSwipeUpdateValueChanged() {
     final SwipeType oldSwipeThresholdReached = _swipeThresholdReached;
     SwipeType newSwipeThresholdReached = SwipeType.none;
-    // print('now swipeType: $_swipeThresholdReached');
     // if (widget.swipeThresholds[_swipeDirection] == null) {
     //   _swipeThresholdReached = SwipeType.none;
     // } else if (_moveController!.value > _kSwipeThreshold) {
@@ -323,8 +325,7 @@ class _SwipeableState extends State<Swipeable>
   void _startResizeAnimation() {
     if (widget.resizeDuration == null) {
       if (widget.onSwiped != null) {
-        final SwipeDirection direction = _swipeDirection;
-        widget.onSwiped!(direction);
+        widget.onSwiped?.call(_swipeDirection);
       }
     } else {
       _resizeController =
@@ -365,6 +366,7 @@ class _SwipeableState extends State<Swipeable>
       return null;
     }
     List _lists = [];
+    double alpha = _swipeThresholdReached == SwipeType.long ? 1.0 : 0.3;
     for (int i = 0; i < widget.icons!.length; i++) {
       var iconData = _swipeThresholdReached == SwipeType.long
           ? widget.icons![i]
@@ -372,7 +374,7 @@ class _SwipeableState extends State<Swipeable>
 
       // TODO: moveController value가 short 초과 long 미만인 상태라면 short 상태 포지셔닝 유지
       _lists.add(Positioned(
-        right: _dragExtent.abs() * _moveController!.value * i,
+        right: _dragExtent.abs() * _moveController!.value * i * alpha,
         child: Visibility(
           visible:
               _swipeThresholdReached == SwipeType.short || iconData.isRemained,
@@ -383,19 +385,7 @@ class _SwipeableState extends State<Swipeable>
         ),
       ));
     }
-    // for (final iconData in widget.icons!) {
-    //   _lists.add(Positioned(
-    //     right: _dragExtent.abs() * _moveController!.value,
-    //     child: Visibility(
-    //       visible:
-    //           _swipeThresholdReached == SwipeType.short || iconData.isRemained,
-    //       child: IconButton(
-    //         icon: iconData.icon,
-    //         onPressed: iconData.onPressed,
-    //       ),
-    //     ),
-    //   ));
-    // }
+
     return _lists;
   }
 
