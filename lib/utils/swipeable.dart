@@ -161,8 +161,8 @@ class _SwipeableState extends State<Swipeable>
     return size.width;
   }
 
-  void _hanldeDragStart(DragStartDetails details) {
-    if (_confirming) return;
+  void _handleDragStart(DragStartDetails details) {
+    if (widget.onSwiped != null || _confirming) return;
     _dragUnderway = true;
     _isTurned = false;
     if (_moveController!.isAnimating) {
@@ -435,7 +435,7 @@ class _SwipeableState extends State<Swipeable>
     }
 
     return GestureDetector(
-      onHorizontalDragStart: _hanldeDragStart,
+      onHorizontalDragStart: _handleDragStart,
       onHorizontalDragUpdate: _handleDragUpdate,
       onHorizontalDragEnd: _handleDragEnd,
       behavior: widget.behavior,

@@ -10,6 +10,7 @@
   "settingsFontColorTitle": "Font Color",
   "settingsFontSizeTitle": "Font Size",
   "settingsFontSizeValue": "{name, select, small{Small} medium{Medium} large{Large} other{}}",
+  "settingsFlushAtTitle": "Refresh at",
   "settingsSoundTitle": "Sound",
   "settingsSoundSubtitle": "Enable or disable sound on app actions",
   "settingsHapticTitle": "Haptic",

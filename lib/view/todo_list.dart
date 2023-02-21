@@ -10,29 +10,42 @@ class TodoList extends StatelessWidget {
   const TodoList({
     super.key,
     required this.list,
-    required this.onReorder,
-  });
+    this.onReorder,
+  }) : frozen = false;
+
+  const TodoList.frozen({super.key, required this.list})
+      : onReorder = null,
+        frozen = true;
 
   final UnmodifiableListView<Todo> list;
-  final void Function(int oldIndex, int newIndex) onReorder;
+  final void Function(int oldIndex, int newIndex)? onReorder;
+  final bool frozen;
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ReorderableListView.builder(
-        itemBuilder: (context, index) {
-          final item = list[index];
+      child: !frozen
+          ? ReorderableListView.builder(
+              itemBuilder: (context, index) {
+                final item = list[index];
 
-          return TodoItem(
-            key: ValueKey(item),
-            item: item,
-          );
-        },
-        itemCount: list.length,
-        onReorderStart: (index) => HapticFeedback.lightImpact(),
-        onReorder: onReorder,
-        shrinkWrap: true,
-      ),
+                return TodoItem(
+                  key: ValueKey(item),
+                  item: item,
+                );
+              },
+              itemCount: list.length,
+              onReorderStart: (index) => HapticFeedback.lightImpact(),
+              onReorder: (oldIndex, newIndex) {
+                onReorder?.call(oldIndex, newIndex);
+              },
+              shrinkWrap: true,
+            )
+          : Column(
+              children: <Widget>[
+                for (var i = 0; i < list.length; i++) TodoItem(item: list[i])
+              ],
+            ),
     );
   }
 }

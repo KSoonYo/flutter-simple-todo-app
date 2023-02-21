@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/view/settings_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -13,8 +14,14 @@ class TodoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.watch<TodoModel>();
-    model.initialize(AppLocalizations.of(context)!);
+    final todoModel = context.watch<TodoModel>();
+    todoModel.initialize(AppLocalizations.of(context)!);
+
+    final settingsModel = context.watch<SettingsModel>();
+    final flushAt = settingsModel.flushAt;
+    final lastFlushed = settingsModel.lastFlushed;
+
+    bool shouldFlush = true; //_shouldFlush(flushAt, lastFlushed);
 
     return Scaffold(
       body: SafeArea(
@@ -27,13 +34,37 @@ class TodoScreen extends StatelessWidget {
               builder: (context) => const SettingsScreen(),
               isScrollControlled: true,
               useSafeArea: true),
-          child: TodoList(
-            list: model.list,
-            onReorder: model.moveItem,
-          ),
+          child: shouldFlush
+              ? TodoList.frozen(list: todoModel.list)
+              : TodoList(
+                  list: todoModel.list,
+                  onReorder: todoModel.moveItem,
+                ),
         ),
       ),
+      floatingActionButton: shouldFlush
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                todoModel.clear();
+              },
+              label: const Text('🚽🧻🪠'),
+            )
+          : null,
     );
+  }
+
+  bool _shouldFlush(TimeOfDay flushAt, DateTime lastFlushed) {
+    final now = DateTime.now();
+    final flush = now.copyWith(
+      hour: flushAt.hour,
+      minute: flushAt.minute,
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+    );
+
+    final shouldFlush = now.isAfter(flush) && lastFlushed.isBefore(flush);
+    return shouldFlush;
   }
 
   Future<T?> showTodoInput<T>({required BuildContext context}) {

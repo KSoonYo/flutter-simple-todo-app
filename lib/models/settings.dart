@@ -5,9 +5,13 @@ class SettingsModel with ChangeNotifier {
   static const _keyThemeMode = 'theme_mode';
   static const _keyFontColor = 'font_color';
   static const _keyFontSize = 'font_size';
+  static const _keyLastFlushed = 'last_flushed';
+  static const _keyFlushAt = 'flush_at';
 
   static const _defaultThemeMode = ThemeMode.system;
   static const _defaultFontSize = FontSize.large;
+  static final _defaultLastFlushed = DateTime.fromMillisecondsSinceEpoch(0);
+  static const _defaultFlushAt = TimeOfDay(hour: 3, minute: 0);
 
   SettingsModel() {
     _load();
@@ -17,6 +21,8 @@ class SettingsModel with ChangeNotifier {
   var _themeMode = _defaultThemeMode;
   Color? _fontColor;
   FontSize _fontSize = _defaultFontSize;
+  DateTime _lastFlushed = _defaultLastFlushed;
+  TimeOfDay _flushAt = _defaultFlushAt;
 
   ThemeMode get themeMode => _themeMode;
   set themeMode(ThemeMode value) {
@@ -39,6 +45,22 @@ class SettingsModel with ChangeNotifier {
     _store(_keyFontSize, value.index);
 
     _fontSize = value;
+    notifyListeners();
+  }
+
+  DateTime get lastFlushed => _lastFlushed;
+  set lastFlushed(DateTime value) {
+    _store(_keyLastFlushed, value.millisecondsSinceEpoch);
+
+    _lastFlushed = value;
+    notifyListeners();
+  }
+
+  TimeOfDay get flushAt => _flushAt;
+  set flushAt(TimeOfDay value) {
+    _store(_keyFlushAt, value.hour);
+
+    _flushAt = value;
     notifyListeners();
   }
 
@@ -76,6 +98,16 @@ class SettingsModel with ChangeNotifier {
     final rawFontSize = preferences.getInt(_keyFontSize);
     _fontSize =
         rawFontSize != null ? FontSize.values[rawFontSize] : _defaultFontSize;
+
+    final rawLastFlushed = preferences.getInt(_keyLastFlushed);
+    _lastFlushed = rawLastFlushed != null
+        ? DateTime.fromMillisecondsSinceEpoch(rawLastFlushed)
+        : _defaultLastFlushed;
+
+    final rawFlushAt = preferences.getInt(_keyFlushAt);
+    _flushAt = rawFlushAt != null
+        ? TimeOfDay(hour: rawFlushAt, minute: 0)
+        : _defaultFlushAt;
   }
 }
 

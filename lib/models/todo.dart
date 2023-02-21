@@ -54,6 +54,11 @@ class TodoModel with ChangeNotifier {
     _list.insert(to, item);
     notifyListeners();
   }
+
+  void clear() {
+    _list.clear();
+    notifyListeners();
+  }
 }
 
 class Todo {

@@ -73,6 +73,33 @@ class SettingsScreen extends StatelessWidget {
               height: 88,
               child: Center(
                 child: ListTile(
+                  title: Text(t.settingsFlushAtTitle),
+                  trailing: Text(model.flushAt.format(context)),
+                  onTap: () async {
+                    final tod = await showTimePicker(
+                      context: context,
+                      initialEntryMode: TimePickerEntryMode.dialOnly,
+                      initialTime: model.flushAt,
+                      builder: (context, child) {
+                        return MediaQuery(
+                          data: MediaQuery.of(context)
+                              .copyWith(alwaysUse24HourFormat: true),
+                          child: child!,
+                        );
+                      },
+                    );
+
+                    if (tod != null) {
+                      model.flushAt = tod;
+                    }
+                  },
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 88,
+              child: Center(
+                child: ListTile(
                   title: Text(t.settingsSoundTitle),
                   subtitle: Text(t.settingsSoundSubtitle),
                   trailing: Switch.adaptive(

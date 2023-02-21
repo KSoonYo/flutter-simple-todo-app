@@ -9,9 +9,11 @@ class TodoItem extends StatelessWidget {
   const TodoItem({
     super.key,
     required this.item,
+    this.enabled = true,
   });
 
   final Todo item;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -20,28 +22,30 @@ class TodoItem extends StatelessWidget {
         context.select<SettingsModel, FontSize>((model) => model.fontSize);
 
     return Swipeable(
-      onSwiped: (swipeDirection) {
-        if (swipeDirection == SwipeDirection.right) {
-          model.archiveItem(item: item);
-        } else if (swipeDirection == SwipeDirection.left) {
-          model.removeItem(item: item);
-        }
-      },
+      onSwiped: enabled
+          ? (swipeDirection) {
+              if (swipeDirection == SwipeDirection.right) {
+                model.archiveItem(item: item);
+              } else if (swipeDirection == SwipeDirection.left) {
+                model.removeItem(item: item);
+              }
+            }
+          : null,
       child: ListTile(
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
             item.content,
-            style: _getTextStyle(context, fontSize),
+            style: _getTextStyle(context, enabled, fontSize),
             maxLines: 2,
           ),
         ),
-        onTap: () => context.showSnackBar('Toasty!'),
       ),
     );
   }
 
-  TextStyle? _getTextStyle(BuildContext context, FontSize fontSize) {
+  TextStyle? _getTextStyle(
+      BuildContext context, bool enabled, FontSize fontSize) {
     final textTheme = Theme.of(context).textTheme;
 
     late TextStyle? style;
@@ -57,6 +61,7 @@ class TodoItem extends StatelessWidget {
         style = textTheme.headlineLarge;
         break;
     }
+
     return style;
   }
 }
