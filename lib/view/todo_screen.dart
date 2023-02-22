@@ -18,37 +18,40 @@ class TodoScreen extends StatefulWidget {
   State<TodoScreen> createState() => _TodoScreenState();
 }
 
-class _TodoScreenState extends State<TodoScreen>
-    with SingleTickerProviderStateMixin {
-  Offset _listOffset = Offset.zero;
+class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   late AnimatedListController _todoListController;
-  late AnimationController _animationController;
-  late Animation<Offset> _animation;
+  late AnimationController _limitAnimationController;
+  late Animation<Offset> _limitAnimation;
+  late AnimationController _outdatedAnimationController;
+  late Animation<Offset> _outdatedAnimation;
 
   @override
   void initState() {
     super.initState();
     _todoListController = AnimatedListController();
-    _animationController = AnimationController(
+
+    _limitAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _animation = _animationController
+    _limitAnimation = _limitAnimationController
         .drive(CurveTween(curve: Shake()))
         .drive(Animatable.fromCallback((value) => Offset(value * 0.01, 0)));
+
+    _outdatedAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _outdatedAnimation = _outdatedAnimationController
+        .drive(CurveTween(curve: Curves.fastOutSlowIn))
+        .drive(Animatable.fromCallback((value) => Offset(-value, 0)));
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _limitAnimationController.dispose();
 
     super.dispose();
-  }
-
-  void _showList(bool show) {
-    setState(() {
-      _listOffset = Offset(show ? 0 : -1, 0);
-    });
   }
 
   @override
@@ -66,9 +69,9 @@ class _TodoScreenState extends State<TodoScreen>
           onPullDown: () async {
             if (outdated) return;
             if (todoModel.isFull) {
-              _animationController
+              _limitAnimationController
                   .forward()
-                  .then((_) => _animationController.reset());
+                  .then((_) => _limitAnimationController.reset());
 
               final messenger = ScaffoldMessenger.of(context);
               messenger.clearSnackBars();
@@ -89,19 +92,12 @@ class _TodoScreenState extends State<TodoScreen>
               isScrollControlled: true,
               useSafeArea: true),
           child: outdated
-              ? AnimatedSlide(
-                  offset: _listOffset,
-                  curve: Curves.fastOutSlowIn,
-                  duration: const Duration(milliseconds: 300),
-                  onEnd: () {
-                    todoModel.clear();
-                    settingsModel.lastFlushed = DateTime.now();
-                    _showList(true);
-                  },
+              ? SlideTransition(
+                  position: _outdatedAnimation,
                   child: TodoList.frozen(list: todoModel.list),
                 )
               : SlideTransition(
-                  position: _animation,
+                  position: _limitAnimation,
                   child: TodoList(
                     list: todoModel.list,
                     controller: _todoListController,
@@ -111,8 +107,11 @@ class _TodoScreenState extends State<TodoScreen>
       ),
       floatingActionButton: outdated
           ? FloatingActionButton.extended(
-              onPressed: () {
-                _showList(false);
+              onPressed: () async {
+                await _outdatedAnimationController.forward();
+                todoModel.clear();
+                settingsModel.lastFlushed = DateTime.now();
+                _outdatedAnimationController.reset();
               },
               label: const Text('🚽🧻🪠'),
             )
