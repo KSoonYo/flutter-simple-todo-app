@@ -16,14 +16,34 @@ class TodoScreen extends StatefulWidget {
   State<TodoScreen> createState() => _TodoScreenState();
 }
 
-class _TodoScreenState extends State<TodoScreen> {
+class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   Offset _listOffset = Offset.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _addController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _addAnimation =
+        CurvedAnimation(parent: _addController!, curve: Curves.easeOutSine);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _addController?.dispose();
+  }
 
   void _showList(bool show) {
     setState(() {
       _listOffset = Offset(show ? 0 : -1, 0);
     });
   }
+
+  AnimationController? _addController;
+  Animation<double>? _addAnimation;
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +59,11 @@ class _TodoScreenState extends State<TodoScreen> {
     return Scaffold(
       body: SafeArea(
         child: VerticalPullable(
-          onPullDown: () => showTodoInput(
-            context: context,
-          ),
+          onPullDown: () => {
+            showTodoInput(
+              context: context,
+            ).then((value) => _addItem(context, value, _addController))
+          },
           onPullUp: () => showModalBottomSheet(
               context: context,
               builder: (context) => const SettingsScreen(),
@@ -62,6 +84,7 @@ class _TodoScreenState extends State<TodoScreen> {
               : TodoList(
                   list: todoModel.list,
                   onReorder: todoModel.move,
+                  addAnimation: _addAnimation,
                 ),
         ),
       ),
@@ -87,6 +110,14 @@ class _TodoScreenState extends State<TodoScreen> {
     );
 
     return now.isAfter(flush) && lastFlushed.isBefore(flush);
+  }
+
+  void _addItem(
+      BuildContext context, content, AnimationController? addController) {
+    final model = Provider.of<TodoModel>(context, listen: false);
+    model.add(content);
+    if (addController == null) return;
+    addController.forward(from: 0.2);
   }
 
   Future<T?> showTodoInput<T>({required BuildContext context}) {

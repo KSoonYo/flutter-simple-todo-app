@@ -20,11 +20,7 @@ class TodoInputScreen extends StatelessWidget {
             onSubmit: (value) {
               value = value.trim();
 
-              if (value.isNotEmpty) {
-                model.add(value);
-              }
-
-              Navigator.pop(context);
+              Navigator.pop(context, value);
             },
             // onCancel: () => Navigator.pop(context),
           ),
