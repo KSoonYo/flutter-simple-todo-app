@@ -1,7 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'shake.dart';
 
 class TodoInput extends StatefulWidget {
   const TodoInput({
@@ -41,7 +41,7 @@ class _TodoInputState extends State<TodoInput>
       duration: const Duration(milliseconds: 500),
     );
     _animation = _animationController
-        .drive(CurveTween(curve: _Shake()))
+        .drive(CurveTween(curve: Shake()))
         .drive(Animatable.fromCallback((value) => Offset(value * 0.01, 0)));
   }
 
@@ -105,12 +105,5 @@ class _TodoInputState extends State<TodoInput>
         ),
       ),
     );
-  }
-}
-
-class _Shake extends Curve {
-  @override
-  double transformInternal(double t) {
-    return sin(4 * 2 * pi * t);
   }
 }

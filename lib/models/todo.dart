@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TodoModel with ChangeNotifier {
+  static const _maxCount = 5;
+
   late final List<Todo> _list;
   var _initialized = false;
 
   UnmodifiableListView<Todo> get list => UnmodifiableListView(_list);
+  bool get isFull => _list.length >= _maxCount;
 
   void initialize(AppLocalizations appLocalizations) {
     if (_initialized) return;

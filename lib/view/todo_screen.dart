@@ -6,6 +6,7 @@ import 'package:simple_todo/view/settings_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../models/todo.dart';
+import 'shake.dart';
 import 'todo_input_screen.dart';
 import 'todo_list.dart';
 import 'vertical_pullable.dart';
@@ -17,14 +18,31 @@ class TodoScreen extends StatefulWidget {
   State<TodoScreen> createState() => _TodoScreenState();
 }
 
-class _TodoScreenState extends State<TodoScreen> {
+class _TodoScreenState extends State<TodoScreen>
+    with SingleTickerProviderStateMixin {
   Offset _listOffset = Offset.zero;
   late AnimatedListController _todoListController;
+  late AnimationController _animationController;
+  late Animation<Offset> _animation;
 
   @override
   void initState() {
     super.initState();
     _todoListController = AnimatedListController();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _animation = _animationController
+        .drive(CurveTween(curve: Shake()))
+        .drive(Animatable.fromCallback((value) => Offset(value * 0.01, 0)));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+
+    super.dispose();
   }
 
   void _showList(bool show) {
@@ -39,16 +57,25 @@ class _TodoScreenState extends State<TodoScreen> {
     todoModel.initialize(AppLocalizations.of(context)!);
 
     final settingsModel = context.watch<SettingsModel>();
-    final flushAt = settingsModel.flushAt;
-    final lastFlushed = settingsModel.lastFlushed;
-
-    bool shouldFlush = _shouldFlush(flushAt, lastFlushed);
+    bool outdated =
+        _isOutdated(settingsModel.flushAt, settingsModel.lastFlushed);
 
     return Scaffold(
       body: SafeArea(
         child: VerticalPullable(
           onPullDown: () async {
-            if (shouldFlush) return;
+            if (outdated) return;
+            if (todoModel.isFull) {
+              _animationController
+                  .forward()
+                  .then((_) => _animationController.reset());
+
+              final messenger = ScaffoldMessenger.of(context);
+              messenger.clearSnackBars();
+              messenger.showSnackBar(const SnackBar(content: Text('FULL')));
+
+              return;
+            }
 
             final content = await showTodoInput(context: context);
 
@@ -61,7 +88,7 @@ class _TodoScreenState extends State<TodoScreen> {
               builder: (context) => const SettingsScreen(),
               isScrollControlled: true,
               useSafeArea: true),
-          child: shouldFlush
+          child: outdated
               ? AnimatedSlide(
                   offset: _listOffset,
                   curve: Curves.fastOutSlowIn,
@@ -73,13 +100,16 @@ class _TodoScreenState extends State<TodoScreen> {
                   },
                   child: TodoList.frozen(list: todoModel.list),
                 )
-              : TodoList(
-                  list: todoModel.list,
-                  controller: _todoListController,
+              : SlideTransition(
+                  position: _animation,
+                  child: TodoList(
+                    list: todoModel.list,
+                    controller: _todoListController,
+                  ),
                 ),
         ),
       ),
-      floatingActionButton: shouldFlush
+      floatingActionButton: outdated
           ? FloatingActionButton.extended(
               onPressed: () {
                 _showList(false);
@@ -90,7 +120,7 @@ class _TodoScreenState extends State<TodoScreen> {
     );
   }
 
-  bool _shouldFlush(TimeOfDay flushAt, DateTime lastFlushed) {
+  bool _isOutdated(TimeOfDay flushAt, DateTime lastFlushed) {
     final now = DateTime.now();
     final flush = now.copyWith(
       hour: flushAt.hour,
