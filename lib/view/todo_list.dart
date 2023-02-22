@@ -25,25 +25,36 @@ class TodoList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: !frozen
-          ? ReorderableListView.builder(
-              itemBuilder: (context, index) {
-                final item = list[index];
+          ? list.isNotEmpty
+              ? ReorderableListView.builder(
+                  itemBuilder: (context, index) {
+                    final item = list[index];
 
-                return TodoItem(
-                  key: ValueKey(item),
-                  item: item,
-                );
-              },
-              itemCount: list.length,
-              onReorderStart: (index) => HapticFeedback.lightImpact(),
-              onReorder: (oldIndex, newIndex) {
-                onReorder?.call(oldIndex, newIndex);
-              },
-              shrinkWrap: true,
-            )
+                    return TodoItem(
+                      key: ValueKey(item),
+                      item: item,
+                    );
+                  },
+                  itemCount: list.length,
+                  onReorderStart: (index) => HapticFeedback.lightImpact(),
+                  onReorder: (oldIndex, newIndex) {
+                    onReorder?.call(oldIndex, newIndex);
+                  },
+                  shrinkWrap: true,
+                )
+              : Text(
+                  'Empty Dumpty!',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.displayLarge,
+                )
           : Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                for (var i = 0; i < list.length; i++) TodoItem(item: list[i])
+                for (var i = 0; i < list.length; i++)
+                  TodoItem(
+                    item: list[i],
+                    enabled: false,
+                  )
               ],
             ),
     );

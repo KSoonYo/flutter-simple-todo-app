@@ -9,8 +9,21 @@ import 'todo_input_screen.dart';
 import 'todo_list.dart';
 import 'vertical_pullable.dart';
 
-class TodoScreen extends StatelessWidget {
+class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
+
+  @override
+  State<TodoScreen> createState() => _TodoScreenState();
+}
+
+class _TodoScreenState extends State<TodoScreen> {
+  Offset _listOffset = Offset.zero;
+
+  void _showList(bool show) {
+    setState(() {
+      _listOffset = Offset(show ? 0 : -1, 0);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +34,7 @@ class TodoScreen extends StatelessWidget {
     final flushAt = settingsModel.flushAt;
     final lastFlushed = settingsModel.lastFlushed;
 
-    bool shouldFlush = true; //_shouldFlush(flushAt, lastFlushed);
+    bool shouldFlush = _shouldFlush(flushAt, lastFlushed);
 
     return Scaffold(
       body: SafeArea(
@@ -35,7 +48,17 @@ class TodoScreen extends StatelessWidget {
               isScrollControlled: true,
               useSafeArea: true),
           child: shouldFlush
-              ? TodoList.frozen(list: todoModel.list)
+              ? AnimatedSlide(
+                  offset: _listOffset,
+                  curve: Curves.fastOutSlowIn,
+                  duration: const Duration(milliseconds: 300),
+                  onEnd: () {
+                    todoModel.clear();
+                    settingsModel.lastFlushed = DateTime.now();
+                    _showList(true);
+                  },
+                  child: TodoList.frozen(list: todoModel.list),
+                )
               : TodoList(
                   list: todoModel.list,
                   onReorder: todoModel.moveItem,
@@ -45,7 +68,7 @@ class TodoScreen extends StatelessWidget {
       floatingActionButton: shouldFlush
           ? FloatingActionButton.extended(
               onPressed: () {
-                todoModel.clear();
+                _showList(false);
               },
               label: const Text('🚽🧻🪠'),
             )

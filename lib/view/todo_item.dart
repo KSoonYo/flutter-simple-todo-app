@@ -21,45 +21,53 @@ class TodoItem extends StatelessWidget {
     final fontSize =
         context.select<SettingsModel, FontSize>((model) => model.fontSize);
 
-    return Swipeable(
-      onSwiped: enabled
-          ? (swipeDirection) {
+    final content = ListTile(
+      title: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          item.content,
+          style: _getTextStyle(context, enabled, fontSize),
+          maxLines: 2,
+        ),
+      ),
+    );
+
+    return enabled
+        ? Swipeable(
+            onSwiped: (swipeDirection) {
               if (swipeDirection == SwipeDirection.right) {
                 model.archiveItem(item: item);
               } else if (swipeDirection == SwipeDirection.left) {
                 model.removeItem(item: item);
               }
-            }
-          : null,
-      child: ListTile(
-        title: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            item.content,
-            style: _getTextStyle(context, enabled, fontSize),
-            maxLines: 2,
-          ),
-        ),
-      ),
-    );
+            },
+            child: content,
+          )
+        : content;
   }
 
-  TextStyle? _getTextStyle(
+  TextStyle _getTextStyle(
       BuildContext context, bool enabled, FontSize fontSize) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
 
-    late TextStyle? style;
+    TextStyle style;
 
     switch (fontSize) {
       case FontSize.small:
-        style = textTheme.headlineSmall;
+        style = theme.textTheme.headlineSmall!;
         break;
       case FontSize.medium:
-        style = textTheme.headlineMedium;
+        style = theme.textTheme.headlineMedium!;
         break;
       case FontSize.large:
-        style = textTheme.headlineLarge;
+        style = theme.textTheme.headlineLarge!;
         break;
+      default:
+        throw UnsupportedError('Unsupported font size $fontSize');
+    }
+
+    if (!enabled) {
+      style = style.copyWith(color: theme.disabledColor);
     }
 
     return style;
