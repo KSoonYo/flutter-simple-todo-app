@@ -1,84 +1,71 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:great_list_view/great_list_view.dart';
 
 import '../models/todo.dart';
 import 'todo_item.dart';
 
-class TodoList extends StatelessWidget {
-  const TodoList(
-      {super.key, required this.list, this.onReorder, this.addAnimation})
-      : frozen = false;
+class TodoList extends StatefulWidget {
+  const TodoList({
+    super.key,
+    required this.list,
+    this.controller,
+  }) : frozen = false;
 
   const TodoList.frozen({super.key, required this.list})
-      : onReorder = null,
-        addAnimation = null,
-        frozen = true;
+      : frozen = true,
+        controller = null;
 
   final UnmodifiableListView<Todo> list;
-  final void Function(int oldIndex, int newIndex)? onReorder;
   final bool frozen;
-  final Animation<double>? addAnimation;
+  final AnimatedListController? controller;
+
+  @override
+  State<TodoList> createState() => _TodoListState();
+}
+
+class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
+  late AnimatedListController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = widget.controller ?? AnimatedListController();
+  }
 
   @override
   Widget build(BuildContext context) {
-    int newItemIndex = list.length - 1;
+    final visibleItems = widget.list.where((i) => !i.toRemove).toList();
+
     return Center(
-      child: !frozen
-          ? list.isNotEmpty
-              ? ReorderableListView(
-                  onReorderStart: (index) => HapticFeedback.lightImpact(),
-                  onReorder: (oldIndex, newIndex) {
-                    onReorder?.call(oldIndex, newIndex);
-                  },
-                  shrinkWrap: true,
-                  children: [
-                    for (var item in list.where((i) => !i.toRemove))
-                      _buildListItem(
-                          addAnimation, list.indexOf(item), newItemIndex, item)
-                  ],
-                )
-              : Text(
-                  'Empty Dumpty!',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayLarge,
-                )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                for (var item in list)
-                  TodoItem(
-                    item: item,
-                    enabled: false,
-                  )
-              ],
+      child: visibleItems.isNotEmpty
+          ? AutomaticAnimatedListView<Todo>(
+              comparator: AnimatedListDiffListComparator(
+                sameItem: (a, b) => a.id == b.id,
+                sameContent: (a, b) =>
+                    a.content == b.content &&
+                    a.archived == b.archived &&
+                    a.toRemove == b.toRemove,
+              ),
+              reorderModel: AutomaticAnimatedListReorderModel(visibleItems),
+              shrinkWrap: true,
+              list: visibleItems,
+              listController: _controller,
+              addLongPressReorderable: !widget.frozen,
+              itemBuilder: (context, element, data) {
+                return TodoItem(
+                  item: element,
+                  enabled: !widget.frozen,
+                );
+              },
+            )
+          : Text(
+              'Empty Dumpty!',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.displayLarge,
             ),
     );
   }
-}
-
-Widget _buildListItem(
-    Animation<double>? animation, int index, int newIndex, Todo item) {
-  if (animation != null && animation.value > 0 && index == newIndex) {
-    return AnimatedBuilder(
-        key: ValueKey(item),
-        animation: animation,
-        builder: (context, child) {
-          return SizeTransition(
-            sizeFactor: animation,
-            axis: Axis.vertical,
-            child: SizedBox(
-                child: TodoItem(
-              key: ValueKey(item),
-              item: item,
-            )),
-          );
-        });
-  }
-  return TodoItem(
-    key: ValueKey(item),
-    item: item,
-  );
 }

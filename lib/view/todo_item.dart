@@ -37,6 +37,7 @@ class TodoItem extends StatelessWidget {
 
     return enabled
         ? Swipeable(
+            resizeDuration: null, // resize will be taken care by list view
             onSwiped: (swipeDirection) async {
               if (swipeDirection == SwipeDirection.right) {
                 model.setArchived(item: item, archived: true);

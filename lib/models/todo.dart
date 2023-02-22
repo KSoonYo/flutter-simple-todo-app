@@ -14,21 +14,21 @@ class TodoModel with ChangeNotifier {
 
     _initialized = true;
     _list = [
-      Todo(appLocalizations.todoDefaultItem1),
-      Todo(appLocalizations.todoDefaultItem2),
-      Todo(appLocalizations.todoDefaultItem3),
-      Todo(appLocalizations.todoDefaultItem4),
-      Todo(appLocalizations.todoDefaultItem5),
+      Todo(id: 0, content: appLocalizations.todoDefaultItem1),
+      Todo(id: 1, content: appLocalizations.todoDefaultItem2),
+      Todo(id: 2, content: appLocalizations.todoDefaultItem3),
+      Todo(id: 3, content: appLocalizations.todoDefaultItem4),
+      Todo(id: 4, content: appLocalizations.todoDefaultItem5),
     ];
   }
 
   void add(String content) {
-    _list.add(Todo(content));
+    _list.add(Todo(id: _list.length, content: content));
     notifyListeners();
   }
 
   Todo markRemoval({required Todo item, required bool remove}) {
-    final index = _list.indexOf(item);
+    final index = _list.indexWhere((element) => element.id == item.id);
     if (index == -1) throw 'WTF';
 
     final marked = item.copyWith(toRemove: remove);
@@ -45,7 +45,7 @@ class TodoModel with ChangeNotifier {
   }
 
   void setArchived({required Todo item, required bool archived}) {
-    final index = _list.indexOf(item);
+    final index = _list.indexWhere((element) => element.id == item.id);
     if (index == -1) return;
 
     _list[index] = item.copyWith(archived: archived);
@@ -66,15 +66,22 @@ class TodoModel with ChangeNotifier {
 }
 
 class Todo {
+  final int id;
   final String content;
   final bool archived;
   final bool toRemove;
 
-  const Todo(this.content, {this.archived = false, this.toRemove = false});
+  const Todo({
+    required this.id,
+    required this.content,
+    this.archived = false,
+    this.toRemove = false,
+  });
 
   Todo copyWith({String? content, bool? archived, bool? toRemove}) {
     return Todo(
-      content ?? this.content,
+      id: id,
+      content: content ?? this.content,
       archived: archived ?? this.archived,
       toRemove: toRemove ?? this.toRemove,
     );

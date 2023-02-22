@@ -17,6 +17,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  great_list_view: ^0.2.3
 
 dev_dependencies:
   flutter_test:

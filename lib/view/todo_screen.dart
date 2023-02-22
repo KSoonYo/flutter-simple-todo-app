@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/view/settings_screen.dart';
@@ -16,24 +17,14 @@ class TodoScreen extends StatefulWidget {
   State<TodoScreen> createState() => _TodoScreenState();
 }
 
-class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
+class _TodoScreenState extends State<TodoScreen> {
   Offset _listOffset = Offset.zero;
+  late AnimatedListController _todoListController;
 
   @override
   void initState() {
     super.initState();
-    _addController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
-    _addAnimation =
-        CurvedAnimation(parent: _addController!, curve: Curves.easeOutSine);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _addController?.dispose();
+    _todoListController = AnimatedListController();
   }
 
   void _showList(bool show) {
@@ -41,9 +32,6 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
       _listOffset = Offset(show ? 0 : -1, 0);
     });
   }
-
-  AnimationController? _addController;
-  Animation<double>? _addAnimation;
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +47,12 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     return Scaffold(
       body: SafeArea(
         child: VerticalPullable(
-          onPullDown: () => {
-            showTodoInput(
-              context: context,
-            ).then((value) => _addItem(context, value, _addController))
+          onPullDown: () async {
+            final content = await showTodoInput(context: context);
+
+            if (content != null && content.isNotEmpty) {
+              todoModel.add(content);
+            }
           },
           onPullUp: () => showModalBottomSheet(
               context: context,
@@ -83,8 +73,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
                 )
               : TodoList(
                   list: todoModel.list,
-                  onReorder: todoModel.move,
-                  addAnimation: _addAnimation,
+                  controller: _todoListController,
                 ),
         ),
       ),
@@ -112,16 +101,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     return now.isAfter(flush) && lastFlushed.isBefore(flush);
   }
 
-  void _addItem(BuildContext context, String content,
-      AnimationController? addController) {
-    if (content.isEmpty) return;
-    final model = Provider.of<TodoModel>(context, listen: false);
-    model.add(content);
-    if (addController == null) return;
-    addController.forward(from: 0.2);
-  }
-
-  Future<T?> showTodoInput<T>({required BuildContext context}) {
+  Future<String?> showTodoInput({required BuildContext context}) {
     return Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (_, __, ___) {
