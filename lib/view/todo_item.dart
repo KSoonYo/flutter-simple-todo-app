@@ -30,7 +30,7 @@ class TodoItem extends StatelessWidget {
         child: Text(
           item.content,
           style: _getTextStyle(context, enabled, fontSize),
-          maxLines: 2,
+          maxLines: 1,
         ),
       ),
     );

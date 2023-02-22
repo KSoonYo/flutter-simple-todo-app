@@ -18,8 +18,12 @@ class TodoInput extends StatefulWidget {
 }
 
 class _TodoInputState extends State<TodoInput> {
+  static const _maxLength = 40;
+
   late TextEditingController _controller;
-  var _isEmpty = true;
+  var _length = 0;
+  bool get _isEmpty => _length == 0;
+  bool get _isFull => _length == _maxLength;
 
   @override
   void initState() {
@@ -35,9 +39,9 @@ class _TodoInputState extends State<TodoInput> {
     super.dispose();
   }
 
-  void _setEmpty(bool empty) {
+  void _updateLength(int length) {
     setState(() {
-      _isEmpty = empty;
+      _length = length;
     });
   }
 
@@ -56,20 +60,28 @@ class _TodoInputState extends State<TodoInput> {
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
           hintText: t.todoInputHint,
+          counterText: '$_length/$_maxLength',
+          errorText: _isFull ? t.todoInputMaxLengthReached : null,
           suffixIcon: !_isEmpty
               ? IconButton(
-                  onPressed: _controller.clear,
+                  onPressed: () {
+                    _controller.clear();
+                    _updateLength(0);
+                  },
                   icon: const Icon(Icons.clear),
                 )
               : null,
         ),
         autofocus: true,
-        onChanged: (value) => _setEmpty(value.isEmpty),
+        onChanged: (value) {
+          _updateLength(value.length);
+        },
         onSubmitted: (value) {
           widget.onSubmit(value);
           _controller.clear();
         },
         onTapOutside: (_) => widget.onCancel?.call(),
+        maxLength: _maxLength,
       ),
     );
   }

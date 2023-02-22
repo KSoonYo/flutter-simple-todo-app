@@ -7,6 +7,7 @@
   "todoItemRemovedLabel": "To-do removed",
   "todoItemUndoRemoval": "Undo",
   "todoInputHint": "What's next?",
+  "todoInputMaxLengthReached": "Too long",
   "settingsThemeModeTitle": "Theme",
   "settingsThemeModeValue": "{name, select, light{Light} dark{Dark} other{System} }",
   "settingsFontColorTitle": "Font Color",

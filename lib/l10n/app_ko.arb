@@ -7,6 +7,7 @@
   "todoItemRemovedLabel": "할 일이 삭제되었습니다",
   "todoItemUndoRemoval": "되돌리기",
   "todoInputHint": "오늘 할 일",
+  "todoInputMaxLengthReached": "너무 길어요",
   "settingsThemeModeTitle": "테마",
   "settingsThemeModeValue": "{name, select, light{라이트} dark{다크} other{시스템}}",
   "settingsFontColorTitle": "폰트 컬러",
