@@ -39,6 +39,7 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final visibleItems = widget.list.where((i) => !i.toRemove).toList();
 
+    var theme = Theme.of(context);
     return Center(
       child: visibleItems.isNotEmpty
           ? AutomaticAnimatedListView<Todo>(
@@ -62,9 +63,11 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
               },
             )
           : Text(
-              'Empty Dumpty!',
+              '🌝Empty🌚Dumpty!',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.displayLarge,
+              style: theme.textTheme.displayLarge?.copyWith(
+                color: theme.disabledColor,
+              ),
             ),
     );
   }

@@ -42,9 +42,10 @@ class TodoItem extends StatelessWidget {
               if (swipeDirection == SwipeDirection.right) {
                 model.setArchived(item: item, archived: true);
               } else if (swipeDirection == SwipeDirection.left) {
-                final marked = model.markRemoval(item: item, remove: true);
-
                 final messenger = ScaffoldMessenger.of(context);
+                messenger.clearSnackBars();
+
+                final marked = model.markRemoval(item: item, remove: true);
                 final controller = messenger.showSnackBar(
                   SnackBar(
                     content: Text(t.todoItemRemovedLabel),
@@ -96,18 +97,5 @@ class TodoItem extends StatelessWidget {
     }
 
     return style;
-  }
-}
-
-extension SnackBarExtension on BuildContext {
-  void showSnackBar(String content) {
-    final messenger = ScaffoldMessenger.of(this);
-
-    messenger.clearSnackBars();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(content),
-      ),
-    );
   }
 }
