@@ -112,8 +112,9 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     return now.isAfter(flush) && lastFlushed.isBefore(flush);
   }
 
-  void _addItem(
-      BuildContext context, content, AnimationController? addController) {
+  void _addItem(BuildContext context, String content,
+      AnimationController? addController) {
+    if (content.isEmpty) return;
     final model = Provider.of<TodoModel>(context, listen: false);
     model.add(content);
     if (addController == null) return;
