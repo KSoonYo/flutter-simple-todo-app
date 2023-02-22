@@ -43,7 +43,7 @@ class TodoModel with ChangeNotifier {
   }
 
   void remove({required Todo item}) {
-    _list.remove(item);
+    _list.removeWhere((element) => element.id == item.id);
     notifyListeners();
   }
 
