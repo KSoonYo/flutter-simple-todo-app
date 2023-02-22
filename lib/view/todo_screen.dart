@@ -48,6 +48,8 @@ class _TodoScreenState extends State<TodoScreen> {
       body: SafeArea(
         child: VerticalPullable(
           onPullDown: () async {
+            if (shouldFlush) return;
+
             final content = await showTodoInput(context: context);
 
             if (content != null && content.isNotEmpty) {
