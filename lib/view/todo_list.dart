@@ -26,21 +26,19 @@ class TodoList extends StatelessWidget {
     return Center(
       child: !frozen
           ? list.isNotEmpty
-              ? ReorderableListView.builder(
-                  itemBuilder: (context, index) {
-                    final item = list[index];
-
-                    return TodoItem(
-                      key: ValueKey(item),
-                      item: item,
-                    );
-                  },
-                  itemCount: list.length,
+              ? ReorderableListView(
                   onReorderStart: (index) => HapticFeedback.lightImpact(),
                   onReorder: (oldIndex, newIndex) {
                     onReorder?.call(oldIndex, newIndex);
                   },
                   shrinkWrap: true,
+                  children: [
+                    for (var item in list.where((i) => !i.toRemove))
+                      TodoItem(
+                        key: ValueKey(item),
+                        item: item,
+                      )
+                  ],
                 )
               : Text(
                   'Empty Dumpty!',
@@ -50,9 +48,9 @@ class TodoList extends StatelessWidget {
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                for (var i = 0; i < list.length; i++)
+                for (var item in list)
                   TodoItem(
-                    item: list[i],
+                    item: item,
                     enabled: false,
                   )
               ],

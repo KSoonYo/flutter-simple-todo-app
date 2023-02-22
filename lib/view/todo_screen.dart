@@ -61,7 +61,7 @@ class _TodoScreenState extends State<TodoScreen> {
                 )
               : TodoList(
                   list: todoModel.list,
-                  onReorder: todoModel.moveItem,
+                  onReorder: todoModel.move,
                 ),
         ),
       ),
@@ -86,8 +86,7 @@ class _TodoScreenState extends State<TodoScreen> {
       microsecond: 0,
     );
 
-    final shouldFlush = now.isAfter(flush) && lastFlushed.isBefore(flush);
-    return shouldFlush;
+    return now.isAfter(flush) && lastFlushed.isBefore(flush);
   }
 
   Future<T?> showTodoInput<T>({required BuildContext context}) {

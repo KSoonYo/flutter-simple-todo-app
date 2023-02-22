@@ -22,33 +22,37 @@ class TodoModel with ChangeNotifier {
     ];
   }
 
-  void addItem(String content) {
+  void add(String content) {
     _list.add(Todo(content));
     notifyListeners();
   }
 
-  void removeItem({required Todo item}) {
+  Todo markRemoval({required Todo item, required bool remove}) {
+    final index = _list.indexOf(item);
+    if (index == -1) throw 'WTF';
+
+    final marked = item.copyWith(toRemove: remove);
+
+    _list[index] = marked;
+    notifyListeners();
+
+    return marked;
+  }
+
+  void remove({required Todo item}) {
     _list.remove(item);
     notifyListeners();
   }
 
-  void archiveItem({required Todo item}) {
+  void setArchived({required Todo item, required bool archived}) {
     final index = _list.indexOf(item);
     if (index == -1) return;
 
-    _list[index] = item.copyWith(archived: true);
+    _list[index] = item.copyWith(archived: archived);
     notifyListeners();
   }
 
-  void unarchiveItem({required Todo item}) {
-    final index = _list.indexOf(item);
-    if (index == -1) return;
-
-    _list[index] = item.copyWith(archived: false);
-    notifyListeners();
-  }
-
-  void moveItem(int from, int to) {
+  void move(int from, int to) {
     final item = _list.removeAt(from);
     if (from < to) to--;
     _list.insert(to, item);
@@ -64,13 +68,15 @@ class TodoModel with ChangeNotifier {
 class Todo {
   final String content;
   final bool archived;
+  final bool toRemove;
 
-  const Todo(this.content, {this.archived = false});
+  const Todo(this.content, {this.archived = false, this.toRemove = false});
 
-  Todo copyWith({String? content, bool? archived}) {
+  Todo copyWith({String? content, bool? archived, bool? toRemove}) {
     return Todo(
       content ?? this.content,
       archived: archived ?? this.archived,
+      toRemove: toRemove ?? this.toRemove,
     );
   }
 }

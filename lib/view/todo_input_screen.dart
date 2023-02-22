@@ -21,7 +21,7 @@ class TodoInputScreen extends StatelessWidget {
               value = value.trim();
 
               if (value.isNotEmpty) {
-                model.addItem(value);
+                model.add(value);
               }
 
               Navigator.pop(context);

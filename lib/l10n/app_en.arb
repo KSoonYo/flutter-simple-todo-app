@@ -4,6 +4,8 @@
   "todoDefaultItem3": "👈Swipe left to delete/edit a to-do.",
   "todoDefaultItem4": "☝️Long press to reorder your to-do list.",
   "todoDefaultItem5": "👆Swipe up to adjust settings.",
+  "todoItemRemovedLabel": "To-do removed",
+  "todoItemUndoRemoval": "Undo",
   "todoInputHint": "What's next?",
   "settingsThemeModeTitle": "Theme",
   "settingsThemeModeValue": "{name, select, light{Light} dark{Dark} other{System} }",

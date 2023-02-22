@@ -4,6 +4,8 @@
   "todoDefaultItem3": "👈왼쪽으로 스와이프하여 할 일을 삭제/편집하세요.",
   "todoDefaultItem4": "☝️할 일 목록을 길게 누르고 순서를 조정해 보세요.",
   "todoDefaultItem5": "👆위로 스와이프하면 여러가지 설정을 할 수 있어요.",
+  "todoItemRemovedLabel": "할 일이 삭제되었습니다",
+  "todoItemUndoRemoval": "되돌리기",
   "todoInputHint": "오늘 할 일",
   "settingsThemeModeTitle": "테마",
   "settingsThemeModeValue": "{name, select, light{라이트} dark{다크} other{시스템}}",

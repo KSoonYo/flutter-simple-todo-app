@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/utils/swipeable.dart';
@@ -17,6 +18,8 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     final model = context.read<TodoModel>();
     final fontSize =
         context.select<SettingsModel, FontSize>((model) => model.fontSize);
@@ -34,11 +37,32 @@ class TodoItem extends StatelessWidget {
 
     return enabled
         ? Swipeable(
-            onSwiped: (swipeDirection) {
+            onSwiped: (swipeDirection) async {
               if (swipeDirection == SwipeDirection.right) {
-                model.archiveItem(item: item);
+                model.setArchived(item: item, archived: true);
               } else if (swipeDirection == SwipeDirection.left) {
-                model.removeItem(item: item);
+                final marked = model.markRemoval(item: item, remove: true);
+
+                final messenger = ScaffoldMessenger.of(context);
+                final controller = messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(t.todoItemRemovedLabel),
+                    action: SnackBarAction(
+                      label: t.todoItemUndoRemoval,
+                      onPressed: () {
+                        model.markRemoval(item: marked, remove: false);
+                        messenger.hideCurrentSnackBar(
+                          reason: SnackBarClosedReason.action,
+                        );
+                      },
+                    ),
+                  ),
+                );
+
+                final reason = await controller.closed;
+                if (reason != SnackBarClosedReason.action) {
+                  model.remove(item: item);
+                }
               }
             },
             child: content,
