@@ -365,7 +365,7 @@ class _SwipeableState extends State<Swipeable>
     if (widget.icons == null) {
       return null;
     }
-    List _lists = [];
+    List lists = [];
     double alpha = _swipeThresholdReached == SwipeType.long ? 1.0 : 0.3;
     for (int i = 0; i < widget.icons!.length; i++) {
       var iconData = _swipeThresholdReached == SwipeType.long
@@ -373,7 +373,7 @@ class _SwipeableState extends State<Swipeable>
           : widget.icons!.reversed.toList()[i];
 
       // TODO: moveController value가 short 초과 long 미만인 상태라면 short 상태 포지셔닝 유지
-      _lists.add(Positioned(
+      lists.add(Positioned(
         right: _dragExtent.abs() * _moveController!.value * i * alpha,
         child: Visibility(
           visible:
@@ -386,7 +386,7 @@ class _SwipeableState extends State<Swipeable>
       ));
     }
 
-    return _lists;
+    return lists;
   }
 
   @override
