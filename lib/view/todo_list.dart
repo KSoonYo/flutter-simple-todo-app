@@ -24,7 +24,7 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int newItemIndex = list.where((i) => !i.toRemove).toList().length - 1;
+    int newItemIndex = list.length - 1;
     return Center(
       child: !frozen
           ? list.isNotEmpty
