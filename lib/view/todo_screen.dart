@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/view/settings_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:simple_todo/view/todo_input.dart';
 
 import '../models/todo.dart';
+import 'pull_to_reveal.dart';
 import 'shake.dart';
 import 'todo_input_screen.dart';
 import 'todo_list.dart';
-import 'vertical_pullable.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
@@ -19,6 +20,8 @@ class TodoScreen extends StatefulWidget {
 }
 
 class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
+  late PullToRevealController _pullToRevealController;
+  late TodoInputController _todoInputController;
   late AnimatedListController _todoListController;
   late AnimationController _limitAnimationController;
   late Animation<Offset> _limitAnimation;
@@ -28,6 +31,11 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _pullToRevealController = PullToRevealController(
+      onReveal: () => _todoInputController.requestFocus(),
+      onHide: () => _todoInputController.unfocus(),
+    );
+    _todoInputController = TodoInputController();
     _todoListController = AnimatedListController();
 
     _limitAnimationController = AnimationController(
@@ -49,7 +57,10 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _pullToRevealController.dispose();
+    _todoInputController.dispose();
     _limitAnimationController.dispose();
+    _outdatedAnimationController.dispose();
 
     super.dispose();
   }
@@ -64,33 +75,18 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
         _isOutdated(settingsModel.flushAt, settingsModel.lastFlushed);
 
     return Scaffold(
-      body: SafeArea(
-        child: VerticalPullable(
-          onPullDown: () async {
-            if (outdated) return;
-            if (todoModel.isFull) {
-              _limitAnimationController
-                  .forward()
-                  .then((_) => _limitAnimationController.reset());
-
-              final messenger = ScaffoldMessenger.of(context);
-              messenger.clearSnackBars();
-              messenger.showSnackBar(const SnackBar(content: Text('FULL')));
-
-              return;
-            }
-
-            final content = await showTodoInput(context: context);
-
-            if (content != null && content.isNotEmpty) {
-              todoModel.add(content);
-            }
-          },
-          onPullUp: () => showModalBottomSheet(
-              context: context,
-              builder: (context) => const SettingsScreen(),
-              isScrollControlled: true,
-              useSafeArea: true),
+      body: PullToReveal(
+        controller: _pullToRevealController,
+        revealableChild: SafeArea(
+          child: TodoInput(
+            controller: _todoInputController,
+            onSubmit: (value) {
+              if (value.isNotEmpty) todoModel.add(value);
+              _pullToRevealController.hide();
+            },
+          ),
+        ),
+        child: SafeArea(
           child: outdated
               ? SlideTransition(
                   position: _outdatedAnimation,
@@ -116,6 +112,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
               label: const Text('🚽🧻🪠'),
             )
           : null,
+      resizeToAvoidBottomInset: false,
     );
   }
 

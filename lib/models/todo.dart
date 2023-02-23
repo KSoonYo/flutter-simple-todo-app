@@ -26,6 +26,8 @@ class TodoModel with ChangeNotifier {
   }
 
   void add(String content) {
+    if (isFull) return; // should we just throw?
+
     _list.add(Todo(id: _list.length, content: content));
     notifyListeners();
   }
