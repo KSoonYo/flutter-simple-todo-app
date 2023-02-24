@@ -3,7 +3,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_todo/models/settings.dart';
-import 'package:simple_todo/view/settings_screen.dart';
 import 'package:simple_todo/view/todo_input.dart';
 
 import '../models/todo.dart';
@@ -31,10 +30,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _pullToRevealController = PullToRevealController(
-      onReveal: () => _todoInputController.requestFocus(),
-      onHide: () => _todoInputController.unfocus(),
-    );
+    _pullToRevealController = PullToRevealController();
     _todoInputController = TodoInputController();
     _todoListController = AnimatedListController();
 
@@ -77,6 +73,8 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     return Scaffold(
       body: PullToReveal(
         controller: _pullToRevealController,
+        onReveal: () => _todoInputController.requestFocus(),
+        onHide: () => _todoInputController.unfocus(),
         revealableChild: SafeArea(
           child: TodoInput(
             controller: _todoInputController,
