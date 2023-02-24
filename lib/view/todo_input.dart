@@ -3,11 +3,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'shake.dart';
 
-class TodoInputController {
+class TodoInputController extends TextEditingController {
   final FocusNode _focusNode = FocusNode();
 
+  TodoInputController({super.text});
+
+  @override
   void dispose() {
     _focusNode.dispose();
+    super.dispose();
   }
 
   void requestFocus() {
@@ -42,7 +46,6 @@ class _TodoInputState extends State<TodoInput>
   static const _maxLength = 40;
 
   late TodoInputController _controller;
-  late TextEditingController _textEditingController;
   var _length = 0;
   bool get _isEmpty => _length == 0;
   bool get _isFull => _length == _maxLength;
@@ -54,8 +57,8 @@ class _TodoInputState extends State<TodoInput>
   void initState() {
     super.initState();
 
-    _controller = widget.controller ?? TodoInputController();
-    _textEditingController = TextEditingController(text: widget.initialValue);
+    _controller =
+        widget.controller ?? TodoInputController(text: widget.initialValue);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -68,7 +71,6 @@ class _TodoInputState extends State<TodoInput>
   @override
   void dispose() {
     _controller.dispose();
-    _textEditingController.dispose();
     _animationController.dispose();
 
     super.dispose();
@@ -94,7 +96,7 @@ class _TodoInputState extends State<TodoInput>
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: TextField(
-          controller: _textEditingController,
+          controller: _controller,
           keyboardType: TextInputType.text,
           textInputAction: TextInputAction.done,
           style: Theme.of(context).textTheme.headlineLarge,
@@ -107,7 +109,7 @@ class _TodoInputState extends State<TodoInput>
             suffixIcon: !_isEmpty
                 ? IconButton(
                     onPressed: () {
-                      _textEditingController.clear();
+                      _controller.clear();
                       _updateLength(0);
                     },
                     icon: const Icon(Icons.clear),
@@ -120,7 +122,7 @@ class _TodoInputState extends State<TodoInput>
           },
           onSubmitted: (value) {
             widget.onSubmit(value);
-            _textEditingController.clear();
+            _controller.clear();
           },
           maxLength: _maxLength,
         ),
