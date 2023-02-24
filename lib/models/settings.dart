@@ -108,6 +108,8 @@ class SettingsModel with ChangeNotifier {
     _flushAt = rawFlushAt != null
         ? TimeOfDay(hour: rawFlushAt, minute: 0)
         : _defaultFlushAt;
+
+    notifyListeners();
   }
 }
 
