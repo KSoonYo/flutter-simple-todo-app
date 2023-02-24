@@ -151,9 +151,7 @@ class _SwipeableState extends State<Swipeable>
   Animation<double>? _resizeAnimation;
 
   double _dragExtent = 0.0;
-  double _horizonoDragDirectionValue = 0.0;
   double _oldDragExtent = 0.0;
-  double _oldHorizonoDragDirectionValue = 0.0;
   bool _confirming = false;
   bool _dragUnderway = false;
   bool _isTurned = false;
@@ -215,16 +213,13 @@ class _SwipeableState extends State<Swipeable>
   void _handleDragUpdate(DragUpdateDetails details) {
     if (!_isActive) return;
     final double delta = details.primaryDelta!;
-    _oldHorizonoDragDirectionValue = _horizonoDragDirectionValue.sign;
-    _horizonoDragDirectionValue = details.delta.dx.sign;
 
     _oldDragExtent = _dragExtent;
     _dragExtent += delta;
     if (_swipeDirection != SwipeDirection.none &&
         _previousSwipeDirection != SwipeDirection.none &&
         !_isTurned) {
-      _isTurned = _oldHorizonoDragDirectionValue.sign !=
-          _horizonoDragDirectionValue.sign;
+      _isTurned = _dragExtent.sign != _oldDragExtent.sign;
     }
     if (_swipeDirection == SwipeDirection.none) {
       return;
@@ -258,7 +253,6 @@ class _SwipeableState extends State<Swipeable>
   }
 
   Future<void> _handleMoveCompleted() async {
-    // drag를 short 이하로 한 경우, dragExtent와 moveController 값을 short 혹은 아이콘 박스 크기만큼 이동
     double oldMoveControllerValue = _moveController!.value;
     if ((widget.swipeThresholds[_swipeThresholdReached] ?? _kSwipeThreshold) >=
         1.0) {
@@ -266,6 +260,7 @@ class _SwipeableState extends State<Swipeable>
       return;
     }
 
+    // drag를 long 이하로 한 경우, dragExtent와 moveController 값을 short 혹은 아이콘 박스 크기만큼 이동
     if (_moveController!.value > 0 &&
         _moveController!.value < _kLongSwipeThreshold) {
       _moveController!.value = _kShortSwipeThreshold;
@@ -274,8 +269,8 @@ class _SwipeableState extends State<Swipeable>
       return;
     }
 
-    if (oldMoveControllerValue == 0.0 &&
-        !_isTurned &&
+    if (!_isTurned &&
+        oldMoveControllerValue == 0.0 &&
         _swipeDirection == SwipeDirection.right) {
       widget.onSwiped?.call(_swipeDirection);
       return;
