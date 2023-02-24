@@ -24,13 +24,23 @@ class TodoItem extends StatelessWidget {
     final fontSize =
         context.select<SettingsModel, FontSize>((model) => model.fontSize);
 
+    final TextStyle style =
+        _getTextStyle(context, enabled, item.archived, fontSize);
+
+    final Size textSize = _getTextSize(item.content, style);
+
     final content = ListTile(
       title: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Text(
-          item.content,
-          style: _getTextStyle(context, enabled, fontSize),
-          maxLines: 1,
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: CustomPaint(
+          foregroundPainter: item.archived
+              ? LinePainter(context: context, textSize: textSize)
+              : null,
+          child: Text(
+            item.content,
+            style: style,
+            maxLines: 1,
+          ),
         ),
       ),
     );
@@ -40,7 +50,7 @@ class TodoItem extends StatelessWidget {
             resizeDuration: null, // resize will be taken care by list view
             onSwiped: (swipeDirection) async {
               if (swipeDirection == SwipeDirection.right) {
-                model.setArchived(item: item, archived: true);
+                model.setArchived(item: item, archived: !item.archived);
               } else if (swipeDirection == SwipeDirection.left) {
                 final messenger = ScaffoldMessenger.of(context);
                 messenger.clearSnackBars();
@@ -72,8 +82,17 @@ class TodoItem extends StatelessWidget {
         : content;
   }
 
+  Size _getTextSize(String content, TextStyle style) {
+    final TextPainter textPainter = TextPainter(
+        text: TextSpan(text: content, style: style),
+        maxLines: 1,
+        textDirection: TextDirection.ltr)
+      ..layout(minWidth: 0, maxWidth: double.infinity);
+    return textPainter.size;
+  }
+
   TextStyle _getTextStyle(
-      BuildContext context, bool enabled, FontSize fontSize) {
+      BuildContext context, bool enabled, bool archived, FontSize fontSize) {
     final theme = Theme.of(context);
 
     TextStyle style;
@@ -92,10 +111,33 @@ class TodoItem extends StatelessWidget {
         throw UnsupportedError('Unsupported font size $fontSize');
     }
 
-    if (!enabled) {
+    if (!enabled || archived) {
       style = style.copyWith(color: theme.disabledColor);
     }
-
     return style;
+  }
+}
+
+class LinePainter extends CustomPainter {
+  const LinePainter({required this.context, required this.textSize});
+
+  final BuildContext context;
+  final Size textSize;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final theme = Theme.of(context);
+    final p1 = Offset(0, textSize.height / 2);
+    final p2 = Offset(textSize.width > size.width ? size.width : textSize.width,
+        textSize.height / 2);
+    final paint = Paint()
+      ..color = theme.disabledColor
+      ..strokeWidth = 1;
+    canvas.drawLine(p1, p2, paint);
+  }
+
+  @override
+  bool shouldRepaint(LinePainter oldPainter) {
+    return oldPainter.textSize != textSize;
   }
 }
