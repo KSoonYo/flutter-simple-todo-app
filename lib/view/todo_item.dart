@@ -137,7 +137,7 @@ class LinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(LinePainter oldPainter) {
-    return oldPainter.textSize != textSize;
+  bool shouldRepaint(LinePainter oldDelegate) {
+    return oldDelegate.textSize != textSize;
   }
 }
