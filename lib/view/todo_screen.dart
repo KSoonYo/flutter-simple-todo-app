@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_todo/models/settings.dart';
+import 'package:simple_todo/view/settings_screen.dart';
 import 'package:simple_todo/view/todo_input.dart';
 
 import '../models/todo.dart';
@@ -75,7 +76,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
         controller: _pullToRevealController,
         onReveal: () => _focusNode.requestFocus(),
         onHide: () => _focusNode.unfocus(),
-        revealableChild: SafeArea(
+        topChild: SafeArea(
           child: TodoInput(
             focusNode: _focusNode,
             onSubmit: (value) {
@@ -84,6 +85,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
             },
           ),
         ),
+        bottomChild: const SettingsScreen(),
         child: SafeArea(
           child: outdated
               ? SlideTransition(

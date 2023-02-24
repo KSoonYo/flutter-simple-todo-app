@@ -1,5 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+enum PullDirection {
+  down,
+  up,
+}
 
 enum RevealState {
   revealed,
@@ -18,14 +25,16 @@ class PullToRevealController extends ValueNotifier<RevealState> {
 class PullToReveal extends StatefulWidget {
   const PullToReveal({
     super.key,
-    required this.revealableChild,
+    this.topChild,
+    this.bottomChild,
     required this.child,
     this.onReveal,
     this.onHide,
     this.controller,
-  });
+  }) : assert(topChild != null || bottomChild != null);
 
-  final Widget revealableChild;
+  final Widget? topChild;
+  final Widget? bottomChild;
   final Widget child;
   final PullToRevealController? controller;
   final VoidCallback? onReveal;
@@ -36,16 +45,19 @@ class PullToReveal extends StatefulWidget {
 }
 
 class _PullToRevealState extends State<PullToReveal>
-    with SingleTickerProviderStateMixin {
-  final GlobalKey _revealableChildKey = GlobalKey();
+    with TickerProviderStateMixin {
+  final GlobalKey _topChildKey = GlobalKey();
+  final GlobalKey _bottomChildKey = GlobalKey();
   late PullToRevealController _controller;
   late AnimationController _animationController;
 
-  late Animation<Offset> _revealAnimation;
+  late Animation<Offset> _pullDownAnimation;
+  late Animation<Offset> _pullUpAnimation;
   late Animation<Color?> _barrierColorAnimation;
 
   DragStartDetails? _dragStartDetails;
   var _barrierVisible = false;
+  PullDirection? _direction;
 
   @override
   void initState() {
@@ -56,9 +68,13 @@ class _PullToRevealState extends State<PullToReveal>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _revealAnimation = _animationController
-        .drive(CurveTween(curve: Curves.fastOutSlowIn))
+
+    final pullAnimation =
+        _animationController.drive(CurveTween(curve: Curves.fastOutSlowIn));
+    _pullDownAnimation = pullAnimation
         .drive(Tween(begin: const Offset(0, -1), end: const Offset(0, 0)));
+    _pullUpAnimation = pullAnimation
+        .drive(Tween(begin: const Offset(0, 1), end: const Offset(0, 0)));
     _barrierColorAnimation = _animationController.drive(
       ColorTween(
         begin: Colors.transparent,
@@ -66,19 +82,24 @@ class _PullToRevealState extends State<PullToReveal>
       ),
     );
 
-    _controller.addListener(() {
+    _controller.addListener(() async {
       switch (_controller.value) {
         case RevealState.revealed:
           widget.onReveal?.call();
-          _animationController.forward();
+          await _animationController.forward();
           break;
         case RevealState.hidden:
           widget.onHide?.call();
-          _animationController.reverse();
+          await _animationController.reverse();
+
+          setState(() {
+            _direction = null;
+          });
           break;
-        default:
+        case RevealState.revealing:
           break;
       }
+
       setState(() {
         _barrierVisible = _controller.value != RevealState.hidden;
       });
@@ -94,26 +115,42 @@ class _PullToRevealState extends State<PullToReveal>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onVerticalDragStart: (details) => _handleDragStart(details),
-      onVerticalDragUpdate: (details) => _handleDragUpdate(details),
-      onVerticalDragEnd: (details) => _handleDragEnd(details),
-      child: Stack(
-        children: <Widget>[
-          widget.child,
-          if (_barrierVisible)
-            AnimatedModalBarrier(
-              color: _barrierColorAnimation,
-              onDismiss: () => _controller.value = RevealState.hidden,
-            ),
-          SlideTransition(
-            key: _revealableChildKey,
-            position: _revealAnimation,
-            child: widget.revealableChild,
+    return Stack(
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onVerticalDragStart: _handleDragStart,
+          onVerticalDragUpdate: _handleDragUpdate,
+          onVerticalDragEnd: _handleDragEnd,
+          child: widget.child,
+        ),
+        if (_barrierVisible)
+          AnimatedModalBarrier(
+            color: _barrierColorAnimation,
+            onDismiss: () => _controller.value = RevealState.hidden,
           ),
-        ],
-      ),
+        if (widget.topChild != null && _direction == PullDirection.down)
+          SlideTransition(
+            key: _topChildKey,
+            position: _pullDownAnimation,
+            child: widget.topChild,
+          ),
+        if (widget.bottomChild != null && _direction == PullDirection.up)
+          SlideTransition(
+            key: _bottomChildKey,
+            position: _pullUpAnimation,
+            child: GestureDetector(
+              child: widget.bottomChild,
+              onVerticalDragEnd: (details) {
+                // FIXME: A TEMPORARY WAY TO CLOSE THIS SHEEEEEET
+                final velocity = details.primaryVelocity;
+                if (velocity != null && velocity > 400) {
+                  _controller.value = RevealState.hidden;
+                }
+              },
+            ),
+          )
+      ],
     );
   }
 
@@ -126,13 +163,37 @@ class _PullToRevealState extends State<PullToReveal>
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
-    final delta =
-        details.globalPosition.dy - _dragStartDetails!.globalPosition.dy;
-    final height = _revealableChildKey.currentContext?.size?.height;
+    var delta = (details.globalPosition - _dragStartDetails!.globalPosition).dy;
+    var direction = _direction;
 
-    if (height == null) return;
+    if (_direction == null) {
+      direction = delta > 0 ? PullDirection.down : PullDirection.up;
+    }
 
-    _animationController.value = delta / height;
+    switch (direction) {
+      case PullDirection.down:
+        delta = max(0, delta); // lower bound
+        break;
+      case PullDirection.up:
+        delta = min(0, delta); // upper bound
+        break;
+      default:
+        break;
+    }
+
+    final height =
+        (direction == PullDirection.down ? _topChildKey : _bottomChildKey)
+            .currentContext
+            ?.size
+            ?.height;
+
+    if (height != null) {
+      _animationController.value = delta.abs() / height;
+    }
+
+    setState(() {
+      _direction = direction;
+    });
   }
 
   void _handleDragEnd(DragEndDetails details) {
