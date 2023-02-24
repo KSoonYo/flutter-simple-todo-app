@@ -3,36 +3,16 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'shake.dart';
 
-class TodoInputController extends TextEditingController {
-  final FocusNode _focusNode = FocusNode();
-
-  TodoInputController({super.text});
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void requestFocus() {
-    _focusNode.requestFocus();
-  }
-
-  void unfocus() {
-    _focusNode.unfocus();
-  }
-}
-
 class TodoInput extends StatefulWidget {
   const TodoInput({
     super.key,
-    this.controller,
+    this.focusNode,
     required this.onSubmit,
     this.onCancel,
     this.initialValue,
   });
 
-  final TodoInputController? controller;
+  final FocusNode? focusNode;
   final void Function(String value) onSubmit;
   final void Function()? onCancel;
   final String? initialValue;
@@ -45,7 +25,7 @@ class _TodoInputState extends State<TodoInput>
     with SingleTickerProviderStateMixin {
   static const _maxLength = 40;
 
-  late TodoInputController _controller;
+  late TextEditingController _controller;
   var _length = 0;
   bool get _isEmpty => _length == 0;
   bool get _isFull => _length == _maxLength;
@@ -57,8 +37,7 @@ class _TodoInputState extends State<TodoInput>
   void initState() {
     super.initState();
 
-    _controller =
-        widget.controller ?? TodoInputController(text: widget.initialValue);
+    _controller = TextEditingController(text: widget.initialValue);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -116,7 +95,7 @@ class _TodoInputState extends State<TodoInput>
                   )
                 : null,
           ),
-          focusNode: _controller._focusNode,
+          focusNode: widget.focusNode,
           onChanged: (value) {
             _updateLength(value.length);
           },

@@ -20,7 +20,7 @@ class TodoScreen extends StatefulWidget {
 
 class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   late PullToRevealController _pullToRevealController;
-  late TodoInputController _todoInputController;
+  late FocusNode _focusNode;
   late AnimatedListController _todoListController;
   late AnimationController _limitAnimationController;
   late Animation<Offset> _limitAnimation;
@@ -31,8 +31,8 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _pullToRevealController = PullToRevealController();
-    _todoInputController = TodoInputController();
     _todoListController = AnimatedListController();
+    _focusNode = FocusNode();
 
     _limitAnimationController = AnimationController(
       vsync: this,
@@ -54,7 +54,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     _pullToRevealController.dispose();
-    _todoInputController.dispose();
+    _focusNode.dispose();
     _limitAnimationController.dispose();
     _outdatedAnimationController.dispose();
 
@@ -73,11 +73,11 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     return Scaffold(
       body: PullToReveal(
         controller: _pullToRevealController,
-        onReveal: () => _todoInputController.requestFocus(),
-        onHide: () => _todoInputController.unfocus(),
+        onReveal: () => _focusNode.requestFocus(),
+        onHide: () => _focusNode.unfocus(),
         revealableChild: SafeArea(
           child: TodoInput(
-            controller: _todoInputController,
+            focusNode: _focusNode,
             onSubmit: (value) {
               if (value.isNotEmpty) todoModel.add(value);
               _pullToRevealController.hide();
