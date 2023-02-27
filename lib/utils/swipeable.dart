@@ -380,7 +380,7 @@ class _SwipeableState extends State<Swipeable>
     }
   }
 
-  List _getIconButtons(double screenSize) {
+  List _getIconButtons(ThemeData theme, double screenSize) {
     List lists = [];
     double alpha = -_iconSize / 2;
     double offset = _moveAnimation.value.dx * screenSize;
@@ -398,10 +398,17 @@ class _SwipeableState extends State<Swipeable>
         child: Visibility(
           visible:
               _swipeThresholdReached == SwipeType.short || iconData.isRemained,
-          child: IconButton(
-            icon: iconData.icon,
-            iconSize: iconData.iconSize * 1.0,
-            onPressed: iconData.onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _swipeThresholdReached == SwipeType.long
+                    ? theme.colorScheme.onSurface.withOpacity(0.12)
+                    : null),
+            child: IconButton(
+              icon: iconData.icon,
+              iconSize: iconData.iconSize * 1.0,
+              onPressed: iconData.onPressed,
+            ),
           ),
         ),
       );
@@ -414,6 +421,8 @@ class _SwipeableState extends State<Swipeable>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    var theme = Theme.of(context);
 
     if (_resizeAnimation != null) {
       return SizeTransition(
@@ -442,7 +451,7 @@ class _SwipeableState extends State<Swipeable>
               children: <Widget>[
                 if (widget.backgroundColor != null)
                   Container(color: widget.backgroundColor),
-                ..._getIconButtons(MediaQuery.of(context).size.width),
+                ..._getIconButtons(theme, MediaQuery.of(context).size.width),
               ]),
         )),
         content
