@@ -185,7 +185,10 @@ class _SwipeableState extends State<Swipeable>
       TrailingIconButton(
           icon: const Icon(Icons.edit),
           iconSize: _iconSize,
-          onPressed: widget.onEditPressed,
+          onPressed: () {
+            widget.onEditPressed?.call();
+            _moveController!.reverse();
+          },
           isRemained: false),
       TrailingIconButton(
           icon: const Icon(Icons.delete),

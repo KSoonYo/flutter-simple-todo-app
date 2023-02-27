@@ -25,6 +25,8 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   late AnimationController _limitAnimationController;
   late Animation<Offset> _limitAnimation;
 
+  Todo? _editingItem;
+
   @override
   void initState() {
     super.initState();
@@ -87,7 +89,10 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
           return false;
         },
         onReveal: () => _focusNode.requestFocus(),
-        onHide: () => _focusNode.unfocus(),
+        onHide: () {
+          _editingItem = null;
+          _focusNode.unfocus();
+        },
         topChild: SafeArea(
           child: FractionallySizedBox(
             heightFactor: 0.5,
@@ -95,8 +100,17 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
               alignment: Alignment.bottomCenter,
               child: TodoInput(
                 focusNode: _focusNode,
+                initialValue: _editingItem?.content,
                 onSubmit: (value) {
-                  if (value.isNotEmpty) todoModel.add(value);
+                  if (value.isNotEmpty) {
+                    final item = _editingItem;
+
+                    if (item != null) {
+                      todoModel.edit(item: item, content: value);
+                    } else {
+                      todoModel.add(value);
+                    }
+                  }
                   _pullToRevealController.hide();
                 },
               ),
@@ -110,6 +124,12 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
             child: TodoList(
               list: todoModel.list,
               controller: _todoListController,
+              onEdit: (item) {
+                setState(() {
+                  _editingItem = item;
+                });
+                _pullToRevealController.show(PullDirection.down);
+              },
             ),
           ),
         ),

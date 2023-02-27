@@ -5,15 +5,16 @@ import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/utils/swipeable.dart';
 
 import '../models/todo.dart';
-import 'todo_input_screen.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({
     super.key,
     required this.item,
+    required this.onEdit,
   });
 
   final Todo item;
+  final void Function(Todo item) onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +76,7 @@ class TodoItem extends StatelessWidget {
           }
         }
       },
-      onEditPressed: () {},
+      onEditPressed: () => onEdit(item),
       child: content,
     );
   }

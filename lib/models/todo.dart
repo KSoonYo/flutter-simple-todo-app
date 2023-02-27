@@ -32,6 +32,16 @@ class TodoModel with ChangeNotifier {
     notifyListeners();
   }
 
+  void edit({required Todo item, required String content}) {
+    final index = _list.indexWhere((element) => element.id == item.id);
+    if (index == -1) return;
+
+    if (item.content == content) return;
+
+    _list[index] = item.copyWith(content: content);
+    notifyListeners();
+  }
+
   Todo markRemoval({required Todo item, required bool remove}) {
     final index = _list.indexWhere((element) => element.id == item.id);
     if (index == -1) throw 'WTF';

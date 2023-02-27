@@ -14,11 +14,13 @@ class TodoList extends StatefulWidget {
   const TodoList({
     super.key,
     required this.list,
+    required this.onEdit,
     this.controller,
   });
 
   final UnmodifiableListView<Todo> list;
   final AnimatedListController? controller;
+  final void Function(Todo item) onEdit;
 
   @override
   State<TodoList> createState() => _TodoListState();
@@ -73,7 +75,10 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
               list: visibleItems,
               listController: _controller,
               itemBuilder: (context, element, data) {
-                return TodoItem(item: element);
+                return TodoItem(
+                  item: element,
+                  onEdit: widget.onEdit,
+                );
               },
             )
           : Text(
