@@ -7,6 +7,7 @@
   "todoItemRemovedLabel": "할 일이 삭제되었습니다",
   "todoItemUndoRemoval": "되돌리기",
   "todoItemMaxCountReached": "할 일이 너무 많은 것 같아요. (5개 이상 추가 불가)",
+  "todoItemHint": "오늘 꼭 해야할 일 몇가지만.",
   "todoInputHint": "오늘 할 일",
   "todoInputMaxLengthReached": "내용이 너무 깁니다. 짧고 간결하게 작성해주세요.",
   "settingsThemeModeTitle": "테마",

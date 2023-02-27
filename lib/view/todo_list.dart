@@ -63,8 +63,7 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
               },
             )
           : Text(
-              '🌝Empty🌚Dumpty!',
-              textAlign: TextAlign.center,
+              t.todoItemHint,
               style: theme.textTheme.displayLarge?.copyWith(
                 color: theme.disabledColor,
               ),

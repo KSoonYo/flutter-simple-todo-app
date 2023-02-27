@@ -7,6 +7,7 @@
   "todoItemRemovedLabel": "To-do removed",
   "todoItemUndoRemoval": "Undo",
   "todoItemMaxCountReached": "Have too many things to do (can't add more than 5)",
+  "todoItemHint": "Just a few things to do today.",
   "todoInputHint": "Today's to-do",
   "todoInputMaxLengthReached": "This is too long. Please keep it short and concise.",
   "settingsThemeModeTitle": "Theme",
