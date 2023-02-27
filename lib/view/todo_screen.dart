@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
-import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/view/settings_screen.dart';
 import 'package:simple_todo/view/todo_input.dart';
 
@@ -25,8 +24,6 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   late AnimatedListController _todoListController;
   late AnimationController _limitAnimationController;
   late Animation<Offset> _limitAnimation;
-  late AnimationController _outdatedAnimationController;
-  late Animation<Offset> _outdatedAnimation;
 
   @override
   void initState() {
@@ -42,14 +39,6 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     _limitAnimation = _limitAnimationController
         .drive(CurveTween(curve: Shake()))
         .drive(Animatable.fromCallback((value) => Offset(value * 0.01, 0)));
-
-    _outdatedAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _outdatedAnimation = _outdatedAnimationController
-        .drive(CurveTween(curve: Curves.fastOutSlowIn))
-        .drive(Animatable.fromCallback((value) => Offset(-value, 0)));
   }
 
   @override
@@ -57,7 +46,6 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     _pullToRevealController.dispose();
     _focusNode.dispose();
     _limitAnimationController.dispose();
-    _outdatedAnimationController.dispose();
 
     super.dispose();
   }
@@ -73,6 +61,8 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
       body: PullToReveal(
         controller: _pullToRevealController,
         onRevealing: (direction) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+
           if (direction != PullDirection.down || !todoModel.isFull) return true;
 
           _limitAnimationController
@@ -99,12 +89,14 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
         onReveal: () => _focusNode.requestFocus(),
         onHide: () => _focusNode.unfocus(),
         topChild: SafeArea(
-          child: TodoInput(
-            focusNode: _focusNode,
-            onSubmit: (value) {
-              if (value.isNotEmpty) todoModel.add(value);
-              _pullToRevealController.hide();
-            },
+          child: Center(
+            child: TodoInput(
+              focusNode: _focusNode,
+              onSubmit: (value) {
+                if (value.isNotEmpty) todoModel.add(value);
+                _pullToRevealController.hide();
+              },
+            ),
           ),
         ),
         bottomChild: const SettingsScreen(),
@@ -118,7 +110,6 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
           ),
         ),
       ),
-      resizeToAvoidBottomInset: false,
     );
   }
 
