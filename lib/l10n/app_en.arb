@@ -4,7 +4,7 @@
   "todoDefaultItem3": "👈Swipe left to delete/edit a to-do.",
   "todoDefaultItem4": "☝️Long press to reorder your to-do list.",
   "todoDefaultItem5": "👆Swipe up to adjust settings.",
-  "todoItemRemovedLabel": "To-do removed",
+  "todoItemRemovedLabel": "Deleted 1 to-do.",
   "todoItemUndoRemoval": "Undo",
   "todoItemMaxCountReached": "Have too many things to do (can't add more than 5)",
   "todoItemHint": "Just a few things to do today.",
