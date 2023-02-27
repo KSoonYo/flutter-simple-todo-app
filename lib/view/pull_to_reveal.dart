@@ -221,6 +221,8 @@ class _PullToRevealState extends State<PullToReveal>
     if (start == null) return;
 
     var delta = (details.globalPosition - start.globalPosition).dy;
+    if (delta == 0) return; // cannot decide a direction yet
+
     var direction = _controller.direction;
     direction ??= delta > 0 ? PullDirection.down : PullDirection.up;
 
