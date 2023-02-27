@@ -5,6 +5,7 @@ import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/utils/swipeable.dart';
 
 import '../models/todo.dart';
+import 'todo_input_screen.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({
@@ -31,7 +32,7 @@ class TodoItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: CustomPaint(
           foregroundPainter: item.archived
-              ? LinePainter(context: context, textSize: textSize)
+              ? TextLinePainter(context: context, textSize: textSize)
               : null,
           child: Text(
             item.content,
@@ -55,6 +56,7 @@ class TodoItem extends StatelessWidget {
           final controller = messenger.showSnackBar(
             SnackBar(
               content: Text(t.todoItemRemovedLabel),
+              behavior: SnackBarBehavior.floating,
               action: SnackBarAction(
                 label: t.todoItemUndoRemoval,
                 onPressed: () {
@@ -73,6 +75,7 @@ class TodoItem extends StatelessWidget {
           }
         }
       },
+      onEditPressed: () {},
       child: content,
     );
   }
@@ -113,8 +116,8 @@ class TodoItem extends StatelessWidget {
   }
 }
 
-class LinePainter extends CustomPainter {
-  const LinePainter({required this.context, required this.textSize});
+class TextLinePainter extends CustomPainter {
+  const TextLinePainter({required this.context, required this.textSize});
 
   final BuildContext context;
   final Size textSize;
@@ -132,7 +135,7 @@ class LinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(LinePainter oldDelegate) {
+  bool shouldRepaint(TextLinePainter oldDelegate) {
     return oldDelegate.textSize != textSize;
   }
 }
