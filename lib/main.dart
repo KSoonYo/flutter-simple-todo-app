@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_todo/theme/dark_theme.dart';
 
 import 'theme/light_theme.dart';
 import 'models/settings.dart';
@@ -23,6 +24,7 @@ void main() {
 class SimpleTodoApp extends StatelessWidget {
   const SimpleTodoApp({super.key});
   static const _defaultLightColorScheme = lightColorScheme;
+  static const _defaultDarkColorScheme = darkColorScheme;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class SimpleTodoApp extends StatelessWidget {
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
-            colorScheme: darkDynamic,
+            colorScheme: darkDynamic ?? _defaultDarkColorScheme,
           ),
           themeMode: themeMode,
           home: const TodoScreen(),
