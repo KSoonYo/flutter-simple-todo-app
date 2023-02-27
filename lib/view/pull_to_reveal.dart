@@ -113,12 +113,6 @@ class _PullToRevealState extends State<PullToReveal>
         .drive(Tween(begin: const Offset(0, -1), end: const Offset(0, 0)));
     _pullUpAnimation = pullAnimation
         .drive(Tween(begin: const Offset(0, 1), end: const Offset(0, 0)));
-    _barrierColorAnimation = _animationController.drive(
-      ColorTween(
-        begin: Colors.transparent,
-        end: Colors.black,
-      ),
-    );
 
     _controller.addListener(() async {
       switch (_controller.state) {
@@ -150,6 +144,12 @@ class _PullToRevealState extends State<PullToReveal>
 
   @override
   Widget build(BuildContext context) {
+    _barrierColorAnimation = _animationController.drive(
+      ColorTween(
+        end: Theme.of(context).scaffoldBackgroundColor,
+      ),
+    );
+
     return Stack(
       children: [
         GestureDetector(
