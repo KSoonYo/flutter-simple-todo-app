@@ -9,20 +9,53 @@ enum PullDirection {
 }
 
 enum RevealState {
-  revealed,
+  topRevealed,
+  bottomRevealed,
   revealing,
-  hidden,
+  idle,
 }
 
-class PullToRevealController extends ValueNotifier<RevealState> {
-  PullToRevealController() : super(RevealState.hidden);
+class PullToRevealController extends ChangeNotifier {
+  PullToRevealController();
+
+  RevealState _state = RevealState.idle;
+  PullDirection? _direction;
+
+  RevealState get state => _state;
+  set state(RevealState value) {
+    if (value == _state) return;
+
+    _state = value;
+    if (_state != RevealState.revealing) _direction = null;
+
+    notifyListeners();
+  }
+
+  PullDirection? get direction => _direction;
+  set direction(PullDirection? value) {
+    if (value == _direction) return;
+
+    _direction = value;
+    notifyListeners();
+  }
+
+  void show(PullDirection direction) {
+    state = direction == PullDirection.down
+        ? RevealState.topRevealed
+        : RevealState.bottomRevealed;
+  }
 
   void hide() {
-    value = RevealState.hidden;
+    state = RevealState.idle;
   }
 }
 
+typedef RevealingCallback = bool Function(PullDirection direction);
+
 class PullToReveal extends StatefulWidget {
+  static const defaultRevealDragDistanceThreshold = 0.4;
+  static const defaultRevealDragVelocityThreshold = 700.0;
+
   const PullToReveal({
     super.key,
     this.topChild,
@@ -30,7 +63,10 @@ class PullToReveal extends StatefulWidget {
     required this.child,
     this.onReveal,
     this.onHide,
+    this.onRevealing,
     this.controller,
+    this.revealDragDistanceThreshold = defaultRevealDragDistanceThreshold,
+    this.revealDragVelocityThreshold = defaultRevealDragVelocityThreshold,
   }) : assert(topChild != null || bottomChild != null);
 
   final Widget? topChild;
@@ -39,6 +75,9 @@ class PullToReveal extends StatefulWidget {
   final PullToRevealController? controller;
   final VoidCallback? onReveal;
   final VoidCallback? onHide;
+  final RevealingCallback? onRevealing;
+  final double revealDragDistanceThreshold;
+  final double revealDragVelocityThreshold;
 
   @override
   State<PullToReveal> createState() => _PullToRevealState();
@@ -57,7 +96,6 @@ class _PullToRevealState extends State<PullToReveal>
 
   DragStartDetails? _dragStartDetails;
   var _barrierVisible = false;
-  PullDirection? _direction;
 
   @override
   void initState() {
@@ -83,25 +121,22 @@ class _PullToRevealState extends State<PullToReveal>
     );
 
     _controller.addListener(() async {
-      switch (_controller.value) {
-        case RevealState.revealed:
+      switch (_controller.state) {
+        case RevealState.topRevealed:
+        case RevealState.bottomRevealed:
           widget.onReveal?.call();
           await _animationController.forward();
           break;
-        case RevealState.hidden:
+        case RevealState.idle:
           widget.onHide?.call();
           await _animationController.reverse();
-
-          setState(() {
-            _direction = null;
-          });
           break;
         case RevealState.revealing:
           break;
       }
 
       setState(() {
-        _barrierVisible = _controller.value != RevealState.hidden;
+        _barrierVisible = _controller.state != RevealState.idle;
       });
     });
   }
@@ -122,20 +157,21 @@ class _PullToRevealState extends State<PullToReveal>
           onVerticalDragStart: _handleDragStart,
           onVerticalDragUpdate: _handleDragUpdate,
           onVerticalDragEnd: _handleDragEnd,
+          onVerticalDragCancel: _handleDragCancel,
           child: widget.child,
         ),
         if (_barrierVisible)
           AnimatedModalBarrier(
             color: _barrierColorAnimation,
-            onDismiss: () => _controller.value = RevealState.hidden,
+            onDismiss: () => _controller.state = RevealState.idle,
           ),
-        if (widget.topChild != null && _direction == PullDirection.down)
+        if (_shouldShowTopChild)
           SlideTransition(
             key: _topChildKey,
             position: _pullDownAnimation,
             child: widget.topChild,
           ),
-        if (widget.bottomChild != null && _direction == PullDirection.up)
+        if (_shouldShowBottomChild)
           SlideTransition(
             key: _bottomChildKey,
             position: _pullUpAnimation,
@@ -145,7 +181,7 @@ class _PullToRevealState extends State<PullToReveal>
                 // FIXME: A TEMPORARY WAY TO CLOSE THIS SHEEEEEET
                 final velocity = details.primaryVelocity;
                 if (velocity != null && velocity > 400) {
-                  _controller.value = RevealState.hidden;
+                  _controller.state = RevealState.idle;
                 }
               },
             ),
@@ -154,20 +190,44 @@ class _PullToRevealState extends State<PullToReveal>
     );
   }
 
+  bool get _shouldShowTopChild {
+    if (widget.topChild == null) return false;
+
+    if (_controller.state == RevealState.topRevealed) return true;
+
+    return _controller.state == RevealState.revealing &&
+        _controller.direction == PullDirection.down;
+  }
+
+  bool get _shouldShowBottomChild {
+    if (widget.bottomChild == null) return false;
+
+    if (_controller.state == RevealState.bottomRevealed) return true;
+
+    return _controller.state == RevealState.revealing &&
+        _controller.direction == PullDirection.up;
+  }
+
   void _handleDragStart(DragStartDetails details) {
     _dragStartDetails = details;
 
-    if (_controller.value == RevealState.hidden) HapticFeedback.lightImpact();
+    if (_controller.state == RevealState.idle) HapticFeedback.lightImpact();
 
-    _controller.value = RevealState.revealing;
+    _controller.state = RevealState.revealing;
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
-    var delta = (details.globalPosition - _dragStartDetails!.globalPosition).dy;
-    var direction = _direction;
+    final start = _dragStartDetails;
+    if (start == null) return;
 
-    if (_direction == null) {
-      direction = delta > 0 ? PullDirection.down : PullDirection.up;
+    var delta = (details.globalPosition - start.globalPosition).dy;
+    var direction = _controller.direction;
+    direction ??= delta > 0 ? PullDirection.down : PullDirection.up;
+
+    if (widget.onRevealing?.call(direction) == false) {
+      _controller.state = RevealState.idle;
+      _dragStartDetails = null; // TODO find a way to cancel drag itself
+      return;
     }
 
     switch (direction) {
@@ -191,20 +251,36 @@ class _PullToRevealState extends State<PullToReveal>
       _animationController.value = delta.abs() / height;
     }
 
-    setState(() {
-      _direction = direction;
-    });
+    _controller.direction = direction;
   }
 
   void _handleDragEnd(DragEndDetails details) {
-    if (_controller.value != RevealState.revealing) return;
+    if (_dragStartDetails == null) return;
+    _dragStartDetails = null;
 
-    _controller.value = _animationController.value >= 0.4
-        ? RevealState.revealed
-        : RevealState.hidden;
+    final direction = _controller.direction;
+    if (_controller.state != RevealState.revealing || direction == null) return;
 
-    if (_controller.value == RevealState.revealed) {
-      HapticFeedback.heavyImpact();
+    final velocity = details.primaryVelocity;
+
+    if (_animationController.value < widget.revealDragDistanceThreshold &&
+        (velocity != null &&
+            velocity.abs() < widget.revealDragVelocityThreshold)) {
+      _controller.state = RevealState.idle;
+      return;
     }
+
+    _controller.state = direction == PullDirection.down
+        ? RevealState.topRevealed
+        : RevealState.bottomRevealed;
+
+    HapticFeedback.heavyImpact();
+  }
+
+  void _handleDragCancel() {
+    if (_dragStartDetails == null) return;
+    _dragStartDetails = null;
+
+    _controller.state = RevealState.idle;
   }
 }
