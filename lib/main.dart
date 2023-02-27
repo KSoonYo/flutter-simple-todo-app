@@ -16,15 +16,19 @@ void main() {
         ChangeNotifierProvider(create: (context) => TodoModel()),
         ChangeNotifierProvider(create: (context) => SettingsModel()),
       ],
-      child: const SimpleTodoApp(),
+      child: SimpleTodoApp(),
     ),
   );
 }
 
 class SimpleTodoApp extends StatelessWidget {
-  const SimpleTodoApp({super.key});
+  SimpleTodoApp({super.key});
   static const _defaultLightColorScheme = lightColorScheme;
   static const _defaultDarkColorScheme = darkColorScheme;
+  final _baseThemeData = ThemeData(
+    useMaterial3: true,
+    snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +41,10 @@ class SimpleTodoApp extends StatelessWidget {
           title: 'Simple Todo',
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          theme: ThemeData(
-            useMaterial3: true,
+          theme: _baseThemeData.copyWith(
             colorScheme: lightDynamic ?? _defaultLightColorScheme,
           ),
-          darkTheme: ThemeData(
-            useMaterial3: true,
+          darkTheme: _baseThemeData.copyWith(
             colorScheme: darkDynamic ?? _defaultDarkColorScheme,
           ),
           themeMode: themeMode,
