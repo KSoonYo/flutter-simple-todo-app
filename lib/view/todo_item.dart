@@ -10,11 +10,9 @@ class TodoItem extends StatelessWidget {
   const TodoItem({
     super.key,
     required this.item,
-    this.enabled = true,
   });
 
   final Todo item;
-  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +22,7 @@ class TodoItem extends StatelessWidget {
     final fontSize =
         context.select<SettingsModel, FontSize>((model) => model.fontSize);
 
-    final TextStyle style =
-        _getTextStyle(context, enabled, item.archived, fontSize);
+    final TextStyle style = _getTextStyle(context, item.archived, fontSize);
 
     final Size textSize = _getTextSize(item.content, style);
 
@@ -33,7 +30,7 @@ class TodoItem extends StatelessWidget {
       title: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: CustomPaint(
-          foregroundPainter: enabled && item.archived
+          foregroundPainter: item.archived
               ? LinePainter(context: context, textSize: textSize)
               : null,
           child: Text(
@@ -45,41 +42,39 @@ class TodoItem extends StatelessWidget {
       ),
     );
 
-    return enabled
-        ? Swipeable(
-            resizeDuration: null, // resize will be taken care by list view
-            onSwiped: (swipeDirection) async {
-              if (swipeDirection == SwipeDirection.right) {
-                model.setArchived(item: item, archived: !item.archived);
-              } else if (swipeDirection == SwipeDirection.left) {
-                final messenger = ScaffoldMessenger.of(context);
-                messenger.clearSnackBars();
+    return Swipeable(
+      resizeDuration: null, // resize will be taken care by list view
+      onSwiped: (swipeDirection) async {
+        if (swipeDirection == SwipeDirection.right) {
+          model.setArchived(item: item, archived: !item.archived);
+        } else if (swipeDirection == SwipeDirection.left) {
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.clearSnackBars();
 
-                final marked = model.markRemoval(item: item, remove: true);
-                final controller = messenger.showSnackBar(
-                  SnackBar(
-                    content: Text(t.todoItemRemovedLabel),
-                    action: SnackBarAction(
-                      label: t.todoItemUndoRemoval,
-                      onPressed: () {
-                        model.markRemoval(item: marked, remove: false);
-                        messenger.hideCurrentSnackBar(
-                          reason: SnackBarClosedReason.action,
-                        );
-                      },
-                    ),
-                  ),
-                );
+          final marked = model.markRemoval(item: item, remove: true);
+          final controller = messenger.showSnackBar(
+            SnackBar(
+              content: Text(t.todoItemRemovedLabel),
+              action: SnackBarAction(
+                label: t.todoItemUndoRemoval,
+                onPressed: () {
+                  model.markRemoval(item: marked, remove: false);
+                  messenger.hideCurrentSnackBar(
+                    reason: SnackBarClosedReason.action,
+                  );
+                },
+              ),
+            ),
+          );
 
-                final reason = await controller.closed;
-                if (reason != SnackBarClosedReason.action) {
-                  model.remove(item: item);
-                }
-              }
-            },
-            child: content,
-          )
-        : content;
+          final reason = await controller.closed;
+          if (reason != SnackBarClosedReason.action) {
+            model.remove(item: item);
+          }
+        }
+      },
+      child: content,
+    );
   }
 
   Size _getTextSize(String content, TextStyle style) {
@@ -92,7 +87,7 @@ class TodoItem extends StatelessWidget {
   }
 
   TextStyle _getTextStyle(
-      BuildContext context, bool enabled, bool archived, FontSize fontSize) {
+      BuildContext context, bool disabled, FontSize fontSize) {
     final theme = Theme.of(context);
 
     TextStyle style;
@@ -111,7 +106,7 @@ class TodoItem extends StatelessWidget {
         throw UnsupportedError('Unsupported font size $fontSize');
     }
 
-    if (!enabled || archived) {
+    if (disabled) {
       style = style.copyWith(color: theme.disabledColor);
     }
     return style;

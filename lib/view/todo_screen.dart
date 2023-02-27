@@ -66,12 +66,8 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final todoModel = context.watch<TodoModel>();
     todoModel.initialize(AppLocalizations.of(context)!);
-
-    final settingsModel = context.watch<SettingsModel>();
-    bool outdated =
-        _isOutdated(settingsModel.flushAt, settingsModel.lastFlushed);
-
     final t = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: PullToReveal(
@@ -88,7 +84,13 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
           messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              content: Text(t.todoItemMaxCountReached),
+              backgroundColor: theme.colorScheme.errorContainer,
+              content: Text(
+                t.todoItemMaxCountReached,
+                style: theme.snackBarTheme.contentTextStyle?.copyWith(
+                  color: theme.colorScheme.onErrorContainer,
+                ),
+              ),
             ),
           );
 
@@ -107,46 +109,17 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
         ),
         bottomChild: const SettingsScreen(),
         child: SafeArea(
-          child: outdated
-              ? SlideTransition(
-                  position: _outdatedAnimation,
-                  child: TodoList.frozen(list: todoModel.list),
-                )
-              : SlideTransition(
-                  position: _limitAnimation,
-                  child: TodoList(
-                    list: todoModel.list,
-                    controller: _todoListController,
-                  ),
-                ),
+          child: SlideTransition(
+            position: _limitAnimation,
+            child: TodoList(
+              list: todoModel.list,
+              controller: _todoListController,
+            ),
+          ),
         ),
       ),
-      floatingActionButton: outdated
-          ? FloatingActionButton.extended(
-              onPressed: () async {
-                await _outdatedAnimationController.forward();
-                todoModel.clear();
-                settingsModel.lastFlushed = DateTime.now();
-                _outdatedAnimationController.reset();
-              },
-              label: const Text('🚽🧻🪠'),
-            )
-          : null,
       resizeToAvoidBottomInset: false,
     );
-  }
-
-  bool _isOutdated(TimeOfDay flushAt, DateTime lastFlushed) {
-    final now = DateTime.now();
-    final flush = now.copyWith(
-      hour: flushAt.hour,
-      minute: flushAt.minute,
-      second: 0,
-      millisecond: 0,
-      microsecond: 0,
-    );
-
-    return now.isAfter(flush) && lastFlushed.isBefore(flush);
   }
 
   Future<String?> showTodoInput({required BuildContext context}) {

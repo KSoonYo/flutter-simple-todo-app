@@ -4,6 +4,7 @@
   "todoDefaultItem3": "👈왼쪽으로 스와이프하여 할 일을 삭제/편집하세요.",
   "todoDefaultItem4": "☝️할 일 목록을 길게 누르고 순서를 조정해 보세요.",
   "todoDefaultItem5": "👆위로 스와이프하면 여러가지 설정을 할 수 있어요.",
+  "todoItemOutdated": "새로운 하루를 위해 지난 할 일을 비웠습니다.",
   "todoItemRemovedLabel": "할 일 1개를 삭제 했습니다.",
   "todoItemUndoRemoval": "되돌리기",
   "todoItemMaxCountReached": "할 일이 너무 많은 것 같아요. (5개 이상 추가 불가)",

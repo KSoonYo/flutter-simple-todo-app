@@ -1,8 +1,12 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:great_list_view/great_list_view.dart';
+import 'package:provider/provider.dart';
 
+import '../models/settings.dart';
 import '../models/todo.dart';
 import 'todo_item.dart';
 
@@ -11,14 +15,9 @@ class TodoList extends StatefulWidget {
     super.key,
     required this.list,
     this.controller,
-  }) : frozen = false;
-
-  const TodoList.frozen({super.key, required this.list})
-      : frozen = true,
-        controller = null;
+  });
 
   final UnmodifiableListView<Todo> list;
-  final bool frozen;
   final AnimatedListController? controller;
 
   @override
@@ -37,7 +36,26 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     final visibleItems = widget.list.where((i) => !i.toRemove).toList();
+
+    final todoModel = context.watch<TodoModel>();
+    final settingsModel = context.watch<SettingsModel>();
+
+    if (_isOutdated(settingsModel)) {
+      // HACK
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(t.todoItemOutdated),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(days: 1),
+            onVisible: () => todoModel.clear(),
+          ),
+        );
+      });
+    }
 
     var theme = Theme.of(context);
     return Center(
@@ -54,20 +72,29 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
               shrinkWrap: true,
               list: visibleItems,
               listController: _controller,
-              addLongPressReorderable: !widget.frozen,
               itemBuilder: (context, element, data) {
-                return TodoItem(
-                  item: element,
-                  enabled: !widget.frozen,
-                );
+                return TodoItem(item: element);
               },
             )
           : Text(
               t.todoItemHint,
-              style: theme.textTheme.displayLarge?.copyWith(
+              style: theme.textTheme.headlineLarge?.copyWith(
                 color: theme.disabledColor,
               ),
             ),
     );
+  }
+
+  bool _isOutdated(SettingsModel settingsModel) {
+    final now = DateTime.now();
+    final flush = now.copyWith(
+      hour: settingsModel.flushAt.hour,
+      minute: settingsModel.flushAt.minute,
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+    );
+
+    return now.isAfter(flush) && settingsModel.lastFlushed.isBefore(flush);
   }
 }
