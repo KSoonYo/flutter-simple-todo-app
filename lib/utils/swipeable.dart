@@ -263,7 +263,7 @@ class _SwipeableState extends State<Swipeable>
     // drag를 long 이하로 한 경우, dragExtent와 moveController 값을 short 혹은 아이콘 박스 크기만큼 이동
     if (_moveController!.value > 0 &&
         _moveController!.value < _kLongSwipeThreshold) {
-      _moveController!.value = _kShortSwipeThreshold;
+      _moveController!.value = _kSwipeThreshold;
       _dragExtent = _moveController!.value * _overallDragExtent * -1;
       _oldDragExtent = _dragExtent;
       return;
@@ -387,7 +387,8 @@ class _SwipeableState extends State<Swipeable>
     for (int i = 0; i < 2; i++) {
       var iconData = _defaultIconButtons.reversed.toList()[i];
       double left = screenSize + offset;
-      double widgetLeftPos = screenSize - _iconSize * (i + 1) + alpha * (i + 2);
+      double widgetLeftPos =
+          screenSize - _iconSize * (i + 1) + alpha * (i * 2 + 2);
       Widget iconWidget = AnimatedPositioned(
         left: _swipeThresholdReached == SwipeType.long || left > widgetLeftPos
             ? left
@@ -400,7 +401,6 @@ class _SwipeableState extends State<Swipeable>
           child: IconButton(
             icon: iconData.icon,
             iconSize: iconData.iconSize * 1.0,
-            isSelected: _swipeThresholdReached == SwipeType.long,
             onPressed: iconData.onPressed,
           ),
         ),
