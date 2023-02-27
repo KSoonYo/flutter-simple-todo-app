@@ -89,13 +89,17 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
         onReveal: () => _focusNode.requestFocus(),
         onHide: () => _focusNode.unfocus(),
         topChild: SafeArea(
-          child: Center(
-            child: TodoInput(
-              focusNode: _focusNode,
-              onSubmit: (value) {
-                if (value.isNotEmpty) todoModel.add(value);
-                _pullToRevealController.hide();
-              },
+          child: FractionallySizedBox(
+            heightFactor: 0.5,
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              child: TodoInput(
+                focusNode: _focusNode,
+                onSubmit: (value) {
+                  if (value.isNotEmpty) todoModel.add(value);
+                  _pullToRevealController.hide();
+                },
+              ),
             ),
           ),
         ),

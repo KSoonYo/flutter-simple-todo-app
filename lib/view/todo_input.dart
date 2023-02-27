@@ -72,38 +72,36 @@ class _TodoInputState extends State<TodoInput>
 
     return SlideTransition(
       position: _offsetAnimation,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: TextField(
-          controller: _controller,
-          keyboardType: TextInputType.text,
-          textInputAction: TextInputAction.done,
-          style: theme.textTheme.headlineLarge?.copyWith(
-            color: _isFull
-                ? theme.colorScheme.error
-                : theme.textTheme.headlineLarge?.color,
-          ),
-          textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(
-            border: const UnderlineInputBorder(),
-            hintText: t.todoInputHint,
-            errorText: _isFull ? t.todoInputMaxLengthReached : null,
-            suffixIcon: _isFull
-                ? const Icon(Icons.error)
-                : !_isEmpty
-                    ? IconButton(
-                        onPressed: _controller.clear,
-                        icon: const Icon(Icons.clear),
-                      )
-                    : null,
-          ),
-          focusNode: widget.focusNode,
-          onSubmitted: (value) {
-            widget.onSubmit(value);
-            _controller.clear();
-          },
-          maxLength: _maxLength,
+      child: TextField(
+        controller: _controller,
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.done,
+        style: theme.textTheme.headlineLarge?.copyWith(
+          color: _isFull
+              ? theme.colorScheme.error
+              : theme.textTheme.headlineLarge?.color,
         ),
+        textCapitalization: TextCapitalization.sentences,
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.all(16.0),
+          border: const UnderlineInputBorder(),
+          hintText: t.todoInputHint,
+          errorText: _isFull ? t.todoInputMaxLengthReached : null,
+          suffixIcon: _isFull
+              ? const Icon(Icons.error)
+              : !_isEmpty
+                  ? IconButton(
+                      onPressed: _controller.clear,
+                      icon: const Icon(Icons.clear),
+                    )
+                  : null,
+        ),
+        focusNode: widget.focusNode,
+        onSubmitted: (value) {
+          widget.onSubmit(value);
+          _controller.clear();
+        },
+        maxLength: _maxLength,
       ),
     );
   }
