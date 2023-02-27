@@ -33,7 +33,7 @@ class TodoItem extends StatelessWidget {
       title: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: CustomPaint(
-          foregroundPainter: item.archived
+          foregroundPainter: enabled && item.archived
               ? LinePainter(context: context, textSize: textSize)
               : null,
           child: Text(
