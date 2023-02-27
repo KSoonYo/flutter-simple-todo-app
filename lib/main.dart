@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
+import 'theme/light_theme.dart';
 import 'models/settings.dart';
 import 'models/todo.dart';
 import 'view/todo_screen.dart';
@@ -21,6 +22,7 @@ void main() {
 
 class SimpleTodoApp extends StatelessWidget {
   const SimpleTodoApp({super.key});
+  static const _defaultLightColorScheme = lightColorScheme;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class SimpleTodoApp extends StatelessWidget {
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
             useMaterial3: true,
-            colorScheme: lightDynamic,
+            colorScheme: lightDynamic ?? _defaultLightColorScheme,
           ),
           darkTheme: ThemeData(
             useMaterial3: true,

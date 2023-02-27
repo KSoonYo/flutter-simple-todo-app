@@ -102,7 +102,7 @@ class SettingsScreen extends StatelessWidget {
                 child: ListTile(
                   title: Text(t.settingsSoundTitle),
                   subtitle: Text(t.settingsSoundSubtitle),
-                  trailing: Switch.adaptive(
+                  trailing: Switch(
                     value: true,
                     onChanged: (value) {},
                   ),
@@ -115,7 +115,7 @@ class SettingsScreen extends StatelessWidget {
                 child: ListTile(
                   title: Text(t.settingsHapticTitle),
                   subtitle: Text(t.settingsHapticSubtitle),
-                  trailing: Switch.adaptive(
+                  trailing: Switch(
                     value: true,
                     onChanged: (value) {},
                   ),
