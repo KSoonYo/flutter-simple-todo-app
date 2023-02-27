@@ -28,10 +28,10 @@ class _TodoInputState extends State<TodoInput>
   late TextEditingController _controller;
   var _length = 0;
   bool get _isEmpty => _length == 0;
-  bool get _isFull => _length == _maxLength;
+  bool get _isFull => _length >= _maxLength;
 
   late AnimationController _animationController;
-  late Animation<Offset> _animation;
+  late Animation<Offset> _offsetAnimation;
 
   @override
   void initState() {
@@ -42,9 +42,11 @@ class _TodoInputState extends State<TodoInput>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _animation = _animationController
+    _offsetAnimation = _animationController
         .drive(CurveTween(curve: Shake()))
         .drive(Tween(begin: const Offset(0, 0), end: const Offset(0.01, 0)));
+
+    _controller.addListener(() => _updateLength(_controller.text.length));
   }
 
   @override
@@ -55,50 +57,47 @@ class _TodoInputState extends State<TodoInput>
     super.dispose();
   }
 
-  void _updateLength(int length) async {
-    if (_length != length && length == _maxLength) {
-      await _animationController.forward();
-      _animationController.reset();
+  void _updateLength(int length) {
+    if (length != _length && length >= _maxLength) {
+      _animationController.forward().then((_) => _animationController.reset());
     }
 
-    setState(() {
-      _length = length;
-    });
+    setState(() => _length = length);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final t = AppLocalizations.of(context)!;
 
     return SlideTransition(
-      position: _animation,
+      position: _offsetAnimation,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: TextField(
           controller: _controller,
           keyboardType: TextInputType.text,
           textInputAction: TextInputAction.done,
-          style: Theme.of(context).textTheme.headlineLarge,
+          style: theme.textTheme.headlineLarge?.copyWith(
+            color: _isFull
+                ? theme.colorScheme.error
+                : theme.textTheme.headlineLarge?.color,
+          ),
           textCapitalization: TextCapitalization.sentences,
           decoration: InputDecoration(
             border: const UnderlineInputBorder(),
             hintText: t.todoInputHint,
-            counterText: '$_length/$_maxLength',
             errorText: _isFull ? t.todoInputMaxLengthReached : null,
-            suffixIcon: !_isEmpty
-                ? IconButton(
-                    onPressed: () {
-                      _controller.clear();
-                      _updateLength(0);
-                    },
-                    icon: const Icon(Icons.clear),
-                  )
-                : null,
+            suffixIcon: _isFull
+                ? const Icon(Icons.error)
+                : !_isEmpty
+                    ? IconButton(
+                        onPressed: _controller.clear,
+                        icon: const Icon(Icons.clear),
+                      )
+                    : null,
           ),
           focusNode: widget.focusNode,
-          onChanged: (value) {
-            _updateLength(value.length);
-          },
           onSubmitted: (value) {
             widget.onSubmit(value);
             _controller.clear();
