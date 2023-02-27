@@ -6,7 +6,7 @@
   "todoDefaultItem5": "👆Swipe up to adjust settings.",
   "todoItemRemovedLabel": "To-do removed",
   "todoItemUndoRemoval": "Undo",
-  "todoInputHint": "What's next?",
+  "todoInputHint": "Today's to-do",
   "todoInputMaxLengthReached": "This is too long. Please keep it short and concise.",
   "settingsThemeModeTitle": "Theme",
   "settingsThemeModeValue": "{name, select, light{Light} dark{Dark} other{System} }",

@@ -6,7 +6,7 @@
   "todoDefaultItem5": "👆위로 스와이프하면 여러가지 설정을 할 수 있어요.",
   "todoItemRemovedLabel": "할 일이 삭제되었습니다",
   "todoItemUndoRemoval": "되돌리기",
-  "todoInputHint": "Today's to-do",
+  "todoInputHint": "오늘 할 일",
   "todoInputMaxLengthReached": "내용이 너무 깁니다. 짧고 간결하게 작성해주세요.",
   "settingsThemeModeTitle": "테마",
   "settingsThemeModeValue": "{name, select, light{라이트} dark{다크} other{시스템}}",
