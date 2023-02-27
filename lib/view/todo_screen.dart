@@ -71,9 +71,29 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     bool outdated =
         _isOutdated(settingsModel.flushAt, settingsModel.lastFlushed);
 
+    final t = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: PullToReveal(
         controller: _pullToRevealController,
+        onRevealing: (direction) {
+          if (direction != PullDirection.down || !todoModel.isFull) return true;
+
+          _limitAnimationController
+              .forward()
+              .then((_) => _limitAnimationController.reset());
+
+          final messenger = ScaffoldMessenger.of(context);
+
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(t.todoItemMaxCountReached),
+            ),
+          );
+
+          return false;
+        },
         onReveal: () => _focusNode.requestFocus(),
         onHide: () => _focusNode.unfocus(),
         topChild: SafeArea(

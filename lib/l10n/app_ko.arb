@@ -6,6 +6,7 @@
   "todoDefaultItem5": "👆위로 스와이프하면 여러가지 설정을 할 수 있어요.",
   "todoItemRemovedLabel": "할 일이 삭제되었습니다",
   "todoItemUndoRemoval": "되돌리기",
+  "todoItemMaxCountReached": "할 일이 너무 많은 것 같아요. (5개 이상 추가 불가)",
   "todoInputHint": "오늘 할 일",
   "todoInputMaxLengthReached": "내용이 너무 깁니다. 짧고 간결하게 작성해주세요.",
   "settingsThemeModeTitle": "테마",
