@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
@@ -28,38 +27,39 @@ class TodoList extends StatefulWidget {
 
 class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
   late AnimatedListController _controller;
+  late bool outdated;
 
   @override
   void initState() {
     super.initState();
 
     _controller = widget.controller ?? AnimatedListController();
+
+    final settingsModel = context.read<SettingsModel>();
+    outdated = _isOutdated(settingsModel);
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-
+    var theme = Theme.of(context);
     final visibleItems = widget.list.where((i) => !i.toRemove).toList();
 
-    final todoModel = context.watch<TodoModel>();
-    final settingsModel = context.watch<SettingsModel>();
+    if (outdated) {
+      outdated = false;
 
-    if (_isOutdated(settingsModel)) {
-      // HACK
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(t.todoItemOutdated),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(days: 1),
-            onVisible: () => todoModel.clear(),
-          ),
-        );
-      });
+      final todoModel = context.read<TodoModel>();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.todoItemOutdated),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(days: 1),
+          onVisible: () => todoModel.clear(),
+        ),
+      );
     }
 
-    var theme = Theme.of(context);
     return Center(
       child: visibleItems.isNotEmpty
           ? AutomaticAnimatedListView<Todo>(
