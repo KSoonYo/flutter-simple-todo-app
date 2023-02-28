@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:simple_todo/models/settings.dart';
+import 'package:simple_todo/utils/text.dart';
 
 import 'shake.dart';
 
@@ -23,12 +26,10 @@ class TodoInput extends StatefulWidget {
 
 class _TodoInputState extends State<TodoInput>
     with SingleTickerProviderStateMixin {
-  static const _maxLength = 40;
-
   late TextEditingController _controller;
   var _length = 0;
+  var _maxLength = 0;
   bool get _isEmpty => _length == 0;
-  bool get _isFull => _length >= _maxLength;
 
   late AnimationController _animationController;
   late Animation<Offset> _offsetAnimation;
@@ -72,37 +73,64 @@ class _TodoInputState extends State<TodoInput>
 
     return SlideTransition(
       position: _offsetAnimation,
-      child: TextField(
-        controller: _controller,
-        keyboardType: TextInputType.text,
-        textInputAction: TextInputAction.done,
-        style: theme.textTheme.headlineLarge?.copyWith(
-          color: _isFull
-              ? theme.colorScheme.error
-              : theme.textTheme.headlineLarge?.color,
-        ),
-        textCapitalization: TextCapitalization.sentences,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.all(16.0),
-          border: const UnderlineInputBorder(),
-          hintText: t.todoInputHint,
-          errorText: _isFull ? t.todoInputMaxLengthReached : null,
-          suffixIcon: _isFull
-              ? const Icon(Icons.error)
-              : !_isEmpty
-                  ? IconButton(
-                      onPressed: _controller.clear,
-                      icon: const Icon(Icons.clear),
-                    )
-                  : null,
-        ),
-        focusNode: widget.focusNode,
-        onSubmitted: (value) {
-          widget.onSubmit(value);
-          _controller.clear();
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final textStyle = _getTextStyle(context);
+
+          _maxLength = _calculateMaxLength(textStyle, constraints);
+          final isFull = _controller.text.length >= _maxLength;
+
+          return TextField(
+            controller: _controller,
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.done,
+            style: textStyle.copyWith(
+              color: isFull ? theme.colorScheme.error : textStyle.color,
+            ),
+            textCapitalization: TextCapitalization.sentences,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.all(16.0),
+              border: const UnderlineInputBorder(),
+              hintText: t.todoInputHint,
+              errorText: isFull ? t.todoInputMaxLengthReached : null,
+              suffixIcon: isFull
+                  ? const Icon(Icons.error)
+                  : !_isEmpty
+                      ? IconButton(
+                          onPressed: _controller.clear,
+                          icon: const Icon(Icons.cancel_outlined),
+                        )
+                      : null,
+            ),
+            focusNode: widget.focusNode,
+            onSubmitted: (value) {
+              widget.onSubmit(value);
+              _controller.clear();
+            },
+            maxLength: _maxLength,
+          );
         },
-        maxLength: _maxLength,
       ),
     );
+  }
+
+  int _calculateMaxLength(TextStyle style, BoxConstraints constraints) {
+    final em = getTextSize('M', style).width;
+    final width = constraints.maxWidth - (16 * 2 + 16 + 24);
+    final rawLength = width ~/ em;
+    final conservativeWidth = rawLength * em - rawLength ~/ 2;
+    return conservativeWidth ~/ em;
+  }
+
+  TextStyle _getTextStyle(BuildContext context) {
+    final fontSize =
+        context.select<SettingsModel, FontSize>((value) => value.fontSize);
+    final theme = Theme.of(context);
+
+    return (fontSize == FontSize.small
+        ? theme.textTheme.headlineSmall
+        : fontSize == FontSize.medium
+            ? theme.textTheme.headlineMedium
+            : theme.textTheme.headlineLarge)!;
   }
 }

@@ -5,6 +5,7 @@ import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/utils/swipeable.dart';
 
 import '../models/todo.dart';
+import '../utils/text.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({
@@ -26,7 +27,7 @@ class TodoItem extends StatelessWidget {
 
     final TextStyle style = _getTextStyle(context, item.archived, fontSize);
 
-    final Size textSize = _getTextSize(item.content, style);
+    final Size textSize = getTextSize(item.content, style);
 
     final content = ListTile(
       title: Padding(
@@ -79,15 +80,6 @@ class TodoItem extends StatelessWidget {
       onEditPressed: () => onEdit(item),
       child: content,
     );
-  }
-
-  Size _getTextSize(String content, TextStyle style) {
-    final TextPainter textPainter = TextPainter(
-        text: TextSpan(text: content, style: style),
-        maxLines: 1,
-        textDirection: TextDirection.ltr)
-      ..layout(minWidth: 0, maxWidth: double.infinity);
-    return textPainter.size;
   }
 
   TextStyle _getTextStyle(
