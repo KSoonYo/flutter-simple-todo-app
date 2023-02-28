@@ -155,8 +155,10 @@ class SettingsScreen extends StatelessWidget {
                           title: Text(t.settingsHapticTitle),
                           subtitle: Text(t.settingsHapticSubtitle),
                           trailing: Switch(
-                            value: true,
-                            onChanged: (value) {},
+                            value: model.isHaptic,
+                            onChanged: (value) {
+                              model.isHaptic = value;
+                            },
                           ),
                         ),
                       ),

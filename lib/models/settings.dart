@@ -7,11 +7,13 @@ class SettingsModel with ChangeNotifier {
   static const _keyFontSize = 'font_size';
   static const _keyLastFlushed = 'last_flushed';
   static const _keyFlushAt = 'flush_at';
+  static const _keyIsHaptic = 'is_haptic';
 
   static const _defaultThemeMode = ThemeMode.system;
   static const _defaultFontSize = FontSize.large;
   static final _defaultLastFlushed = DateTime.now();
   static const _defaultFlushAt = TimeOfDay(hour: 3, minute: 0);
+  static const _defaultIsHaptic = false;
 
   SettingsModel() {
     _load();
@@ -23,6 +25,7 @@ class SettingsModel with ChangeNotifier {
   FontSize _fontSize = _defaultFontSize;
   DateTime _lastFlushed = _defaultLastFlushed;
   TimeOfDay _flushAt = _defaultFlushAt;
+  bool _isHptic = _defaultIsHaptic;
 
   ThemeMode get themeMode => _themeMode;
   set themeMode(ThemeMode value) {
@@ -61,6 +64,13 @@ class SettingsModel with ChangeNotifier {
     _store(_keyFlushAt, value.hour);
 
     _flushAt = value;
+    notifyListeners();
+  }
+
+  bool get isHaptic => _isHptic;
+  set isHaptic(bool value) {
+    _store(_keyIsHaptic, value);
+    _isHptic = value;
     notifyListeners();
   }
 
