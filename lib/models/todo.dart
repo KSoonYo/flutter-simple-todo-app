@@ -8,6 +8,7 @@ class TodoModel with ChangeNotifier {
 
   late final List<Todo> _list;
   var _initialized = false;
+  var _nextIndex = 0;
 
   UnmodifiableListView<Todo> get list => UnmodifiableListView(_list);
   bool get isFull => _list.length >= _maxCount;
@@ -23,12 +24,14 @@ class TodoModel with ChangeNotifier {
       Todo(id: 3, content: appLocalizations.todoDefaultItem4),
       Todo(id: 4, content: appLocalizations.todoDefaultItem5),
     ];
+    _nextIndex = _list.length;
   }
 
   void add(String content) {
     if (isFull) return; // should we just throw?
 
-    _list.add(Todo(id: _list.length, content: content));
+    _list.add(Todo(id: _nextIndex, content: content));
+    _nextIndex = _list.length;
     notifyListeners();
   }
 
