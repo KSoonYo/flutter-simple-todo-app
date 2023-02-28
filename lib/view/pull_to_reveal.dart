@@ -175,15 +175,17 @@ class _PullToRevealState extends State<PullToReveal>
           SlideTransition(
             key: _bottomChildKey,
             position: _pullUpAnimation,
-            child: GestureDetector(
-              child: widget.bottomChild,
-              onVerticalDragEnd: (details) {
-                // FIXME: A TEMPORARY WAY TO CLOSE THIS SHEEEEEET
-                final velocity = details.primaryVelocity;
-                if (velocity != null && velocity > 400) {
+            child: NotificationListener<OverscrollNotification>(
+              onNotification: (notification) {
+                // check if user is scrolling down from the top
+                if (notification.overscroll < -10) {
                   _controller.state = RevealState.idle;
+                  return true;
                 }
+
+                return false;
               },
+              child: widget.bottomChild!,
             ),
           )
       ],
