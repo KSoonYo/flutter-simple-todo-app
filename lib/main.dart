@@ -2,11 +2,11 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:simple_todo/theme/dark_theme.dart';
 
-import 'theme/light_theme.dart';
 import 'models/settings.dart';
 import 'models/todo.dart';
+import 'theme/dark_theme.dart';
+import 'theme/light_theme.dart';
 import 'view/todo_screen.dart';
 
 void main() {
@@ -16,19 +16,17 @@ void main() {
         ChangeNotifierProvider(create: (context) => TodoModel()),
         ChangeNotifierProvider(create: (context) => SettingsModel()),
       ],
-      child: SimpleTodoApp(),
+      child: const SimpleTodoApp(),
     ),
   );
 }
 
 class SimpleTodoApp extends StatelessWidget {
-  SimpleTodoApp({super.key});
+  const SimpleTodoApp({super.key});
   static const _defaultLightColorScheme = lightColorScheme;
   static const _defaultDarkColorScheme = darkColorScheme;
-  final _baseThemeData = ThemeData(
-    useMaterial3: true,
-    snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
-  );
+  static const _snackBarThemeData =
+      SnackBarThemeData(behavior: SnackBarBehavior.floating);
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +39,14 @@ class SimpleTodoApp extends StatelessWidget {
           title: 'Simple Todo',
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          theme: _baseThemeData.copyWith(
+          theme: ThemeData(
+            useMaterial3: true,
+            snackBarTheme: _snackBarThemeData,
             colorScheme: lightDynamic ?? _defaultLightColorScheme,
           ),
-          darkTheme: _baseThemeData.copyWith(
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            snackBarTheme: _snackBarThemeData,
             colorScheme: darkDynamic ?? _defaultDarkColorScheme,
           ),
           themeMode: themeMode,
