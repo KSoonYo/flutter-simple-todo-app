@@ -17,8 +17,6 @@
   "settingsFontSizeTitle": "폰트 사이즈",
   "settingsFontSizeValue": "{name, select, small{작게} medium{중간} large{크게} other{}}",
   "settingsFlushAtTitle": "새로고침 시간",
-  "settingsSoundTitle": "사운드",
-  "settingsSoundSubtitle": "앱 동작 시 사운드 발생 유무를 설정하세요",
   "settingsHapticTitle": "햅틱",
   "settingsHapticSubtitle": "앱 동작 시 촉각 느낌 유무를 설정하세요"
 }
