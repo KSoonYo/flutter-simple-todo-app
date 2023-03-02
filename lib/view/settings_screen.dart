@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_todo/theme/dark_theme.dart';
+import 'package:simple_todo/theme/light_theme.dart';
 
 import '../models/settings.dart';
 
@@ -63,6 +65,13 @@ class SettingsScreen extends StatelessWidget {
                         showSelectedIcon: true,
                         selected: {model.themeMode},
                         onSelectionChanged: (selected) {
+                          if (model.fontColor == colorPallet[0]) {
+                            if (selected.first == ThemeMode.dark) {
+                              model.fontColor = darkColorScheme.onSurface;
+                            } else {
+                              model.fontColor = lightColorScheme.onSurface;
+                            }
+                          }
                           model.themeMode = selected.first;
                         },
                       ),
