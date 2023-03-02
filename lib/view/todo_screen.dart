@@ -8,7 +8,6 @@ import 'package:simple_todo/view/todo_input.dart';
 import '../models/todo.dart';
 import 'pull_to_reveal.dart';
 import 'shake.dart';
-import 'todo_input_screen.dart';
 import 'todo_list.dart';
 
 class TodoScreen extends StatefulWidget {

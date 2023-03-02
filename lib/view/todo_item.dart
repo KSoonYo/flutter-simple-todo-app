@@ -19,8 +19,6 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context)!;
-
     final model = context.read<TodoModel>();
     final fontSize =
         context.select<SettingsModel, FontSize>((model) => model.fontSize);
