@@ -29,14 +29,14 @@ class SettingsScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 86),
-              model.themeMode == ThemeMode.dark
-                  ? SvgPicture.asset('assets/logo_dark.svg')
-                  : SvgPicture.asset('assets/logo.svg'),
               Expanded(
                 child: ListView(
                   physics: const ClampingScrollPhysics(),
                   shrinkWrap: true,
                   children: <Widget>[
+                    model.themeMode == ThemeMode.dark
+                        ? SvgPicture.asset('assets/logo_dark.svg')
+                        : SvgPicture.asset('assets/logo.svg'),
                     SizedBox(
                       height: 72,
                       child: ListTile(title: Text(t.settingsThemeModeTitle)),
