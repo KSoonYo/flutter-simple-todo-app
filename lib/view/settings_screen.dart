@@ -39,7 +39,11 @@ class SettingsScreen extends StatelessWidget {
                         : SvgPicture.asset('assets/logo.svg'),
                     SizedBox(
                       height: 72,
-                      child: ListTile(title: Text(t.settingsThemeModeTitle)),
+                      child: ListTile(
+                          title: Text(
+                        t.settingsThemeModeTitle,
+                        style: theme.textTheme.titleLarge,
+                      )),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
@@ -51,7 +55,9 @@ class SettingsScreen extends StatelessWidget {
                               ButtonSegment(
                                 value: themeMode,
                                 label: Text(
-                                    t.settingsThemeModeValue(themeMode.name)),
+                                  t.settingsThemeModeValue(themeMode.name),
+                                  style: theme.textTheme.labelLarge,
+                                ),
                               ),
                         ],
                         showSelectedIcon: true,
@@ -64,7 +70,9 @@ class SettingsScreen extends StatelessWidget {
                     SizedBox(
                       height: 72,
                       child: Center(
-                        child: ListTile(title: Text(t.settingsFontColorTitle)),
+                        child: ListTile(
+                            title: Text(t.settingsFontColorTitle,
+                                style: theme.textTheme.titleLarge)),
                       ),
                     ),
                     Container(
@@ -99,7 +107,9 @@ class SettingsScreen extends StatelessWidget {
                     SizedBox(
                       height: 72,
                       child: Center(
-                        child: ListTile(title: Text(t.settingsFontSizeTitle)),
+                        child: ListTile(
+                            title: Text(t.settingsFontSizeTitle,
+                                style: theme.textTheme.titleLarge)),
                       ),
                     ),
                     Padding(
@@ -110,8 +120,10 @@ class SettingsScreen extends StatelessWidget {
                           for (var fontSize in FontSize.values)
                             ButtonSegment(
                               value: fontSize,
-                              label:
-                                  Text(t.settingsFontSizeValue(fontSize.name)),
+                              label: Text(
+                                t.settingsFontSizeValue(fontSize.name),
+                                style: theme.textTheme.labelLarge,
+                              ),
                             ),
                         ],
                         showSelectedIcon: true,
@@ -125,8 +137,13 @@ class SettingsScreen extends StatelessWidget {
                       height: 88,
                       child: Center(
                         child: ListTile(
-                          title: Text(t.settingsFlushAtTitle),
-                          trailing: Text(model.flushAt.format(context)),
+                          title: Text(t.settingsFlushAtTitle,
+                              style: theme.textTheme.titleLarge),
+                          trailing: Text(
+                            model.flushAt.format(context),
+                            style: theme.textTheme.bodyLarge!
+                                .copyWith(color: theme.colorScheme.surfaceTint),
+                          ),
                           onTap: () async {
                             final tod = await showTimePicker(
                               context: context,
@@ -152,7 +169,8 @@ class SettingsScreen extends StatelessWidget {
                       height: 88,
                       child: Center(
                         child: ListTile(
-                          title: Text(t.settingsHapticTitle),
+                          title: Text(t.settingsHapticTitle,
+                              style: theme.textTheme.titleLarge),
                           subtitle: Text(t.settingsHapticSubtitle),
                           trailing: Switch(
                             value: model.isHaptic,

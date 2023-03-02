@@ -52,7 +52,9 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(t.todoItemOutdated),
+          content: Text(t.todoItemOutdated,
+              style: theme.textTheme.bodyLarge!
+                  .copyWith(color: theme.colorScheme.onInverseSurface)),
           behavior: SnackBarBehavior.floating,
           duration: const Duration(days: 1),
           onVisible: () => todoModel.clear(),

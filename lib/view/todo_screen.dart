@@ -78,8 +78,11 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
             SnackBar(
               behavior: SnackBarBehavior.floating,
               backgroundColor: theme.colorScheme.errorContainer,
-              content: Text(t.todoItemMaxCountReached,
-                  style: TextStyle(color: theme.colorScheme.onErrorContainer)),
+              content: Text(
+                t.todoItemMaxCountReached,
+                style: theme.textTheme.bodyLarge!
+                    .copyWith(color: theme.colorScheme.onErrorContainer),
+              ),
             ),
           );
 

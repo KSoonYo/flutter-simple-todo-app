@@ -10,7 +10,7 @@ class SettingsModel with ChangeNotifier {
   static const _keyIsHaptic = 'is_haptic';
 
   static const _defaultThemeMode = ThemeMode.system;
-  static const _defaultFontSize = FontSize.large;
+  static const _defaultFontSize = FontSize.small;
   static final _defaultLastFlushed = DateTime.now();
   static const _defaultFlushAt = TimeOfDay(hour: 3, minute: 0);
   static const _defaultIsHaptic = false;

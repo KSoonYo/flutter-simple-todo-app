@@ -16,5 +16,5 @@ const darkColorScheme = ColorScheme.dark(
     surfaceTint: Color(0xffbbc3ff),
     onSurface: Color(0xffc8c5ca),
     onSurfaceVariant: Color(0xffc7c5d0),
-    inverseSurface: Color(0xff1b1b1f),
+    inverseSurface: Color(0xffe4e1e6),
     onInverseSurface: Color(0xff1b1b1f));

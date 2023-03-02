@@ -40,15 +40,43 @@ class SimpleTodoApp extends StatelessWidget {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
-            useMaterial3: true,
-            snackBarTheme: _snackBarThemeData,
-            colorScheme: lightDynamic ?? _defaultLightColorScheme,
-          ),
+              useMaterial3: true,
+              snackBarTheme: _snackBarThemeData,
+              colorScheme: lightDynamic ?? _defaultLightColorScheme,
+              textTheme: TextTheme(
+                  headlineSmall: TextStyle(
+                      color: settings.fontColor, fontWeight: FontWeight.w600),
+                  headlineMedium: TextStyle(
+                      color: settings.fontColor, fontWeight: FontWeight.w600),
+                  headlineLarge: TextStyle(
+                      color: settings.fontColor, fontWeight: FontWeight.w600),
+                  titleLarge: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.w600),
+                  labelLarge: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500),
+                  bodyLarge: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
+                  bodyMedium: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500))),
           darkTheme: ThemeData(
-            useMaterial3: true,
-            snackBarTheme: _snackBarThemeData,
-            colorScheme: darkDynamic ?? _defaultDarkColorScheme,
-          ),
+              useMaterial3: true,
+              snackBarTheme: _snackBarThemeData,
+              colorScheme: darkDynamic ?? _defaultDarkColorScheme,
+              textTheme: TextTheme(
+                  headlineSmall: TextStyle(
+                      color: settings.fontColor, fontWeight: FontWeight.w600),
+                  headlineMedium: TextStyle(
+                      color: settings.fontColor, fontWeight: FontWeight.w600),
+                  headlineLarge: TextStyle(
+                      color: settings.fontColor, fontWeight: FontWeight.w600),
+                  titleLarge: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.w600),
+                  labelLarge: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500),
+                  bodyLarge: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
+                  bodyMedium: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500))),
           themeMode: themeMode,
           home: const TodoScreen(),
         );

@@ -45,6 +45,7 @@ class TodoItem extends StatelessWidget {
       ),
     );
 
+    var theme = Theme.of(context);
     return Swipeable(
       resizeDuration: null, // resize will be taken care by list view
       onSwiped: (swipeDirection) async {
@@ -57,7 +58,9 @@ class TodoItem extends StatelessWidget {
           final marked = model.markRemoval(item: item, remove: true);
           final controller = messenger.showSnackBar(
             SnackBar(
-              content: Text(t.todoItemRemovedLabel),
+              content: Text(t.todoItemRemovedLabel,
+                  style: theme.textTheme.bodyLarge!
+                      .copyWith(color: theme.colorScheme.onInverseSurface)),
               behavior: SnackBarBehavior.floating,
               action: SnackBarAction(
                 label: t.todoItemUndoRemoval,
