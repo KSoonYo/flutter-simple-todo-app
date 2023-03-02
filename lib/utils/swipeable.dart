@@ -240,27 +240,15 @@ class _SwipeableState extends State<Swipeable>
   }
 
   void _handleDragEnd(DragEndDetails details) {
+    double oldMoveControllerValue = _moveController!.value;
+
     if (!_isActive || _moveController!.isAnimating) return;
     _dragUnderway = false;
-
-    _handleMoveCompleted();
 
     if (_swipeThresholdReached == SwipeType.short) {
       _moveController!.stop();
     } else {
       _moveController!.forward();
-    }
-    setState(() {
-      _updateMoveAnimation();
-    });
-  }
-
-  Future<void> _handleMoveCompleted() async {
-    double oldMoveControllerValue = _moveController!.value;
-    if ((widget.swipeThresholds[_swipeThresholdReached] ?? _kSwipeThreshold) >=
-        1.0) {
-      _moveController!.reverse();
-      return;
     }
 
     // drag를 long 이하로 한 경우, dragExtent와 moveController 값을 short 혹은 아이콘 박스 크기만큼 이동
@@ -271,13 +259,21 @@ class _SwipeableState extends State<Swipeable>
       _oldDragExtent = _dragExtent;
       return;
     }
-
     if (!_isTurned &&
         oldMoveControllerValue == 0.0 &&
         _swipeDirection == SwipeDirection.right) {
       widget.onSwiped?.call(_swipeDirection);
       return;
     }
+  }
+
+  Future<void> _handleMoveCompleted() async {
+    if ((widget.swipeThresholds[_swipeThresholdReached] ?? _kSwipeThreshold) >=
+        1.0) {
+      _moveController!.reverse();
+      return;
+    }
+
     final bool result = await _confirmStartResizeAnimation();
     if (mounted) {
       if (result) {
