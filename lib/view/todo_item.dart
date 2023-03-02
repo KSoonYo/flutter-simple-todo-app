@@ -45,44 +45,49 @@ class TodoItem extends StatelessWidget {
       ),
     );
 
-    var theme = Theme.of(context);
     return Swipeable(
       resizeDuration: null, // resize will be taken care by list view
       onSwiped: (swipeDirection) async {
         if (swipeDirection == SwipeDirection.right) {
           model.setArchived(item: item, archived: !item.archived);
         } else if (swipeDirection == SwipeDirection.left) {
-          final messenger = ScaffoldMessenger.of(context);
-          messenger.clearSnackBars();
-
-          final marked = model.markRemoval(item: item, remove: true);
-          final controller = messenger.showSnackBar(
-            SnackBar(
-              content: Text(t.todoItemRemovedLabel,
-                  style: theme.textTheme.bodyLarge!
-                      .copyWith(color: theme.colorScheme.onInverseSurface)),
-              behavior: SnackBarBehavior.floating,
-              action: SnackBarAction(
-                label: t.todoItemUndoRemoval,
-                onPressed: () {
-                  model.markRemoval(item: marked, remove: false);
-                  messenger.hideCurrentSnackBar(
-                    reason: SnackBarClosedReason.action,
-                  );
-                },
-              ),
-            ),
-          );
-
-          final reason = await controller.closed;
-          if (reason != SnackBarClosedReason.action) {
-            model.remove(item: item);
-          }
+          _showSnackBar(context, item);
         }
       },
       onEditPressed: () => onEdit(item),
+      onDeletePressed: () => _showSnackBar(context, item),
       child: content,
     );
+  }
+
+  void _showSnackBar(BuildContext context, Todo item) async {
+    final t = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final model = context.read<TodoModel>();
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+
+    final marked = model.markRemoval(item: item, remove: true);
+    final controller = messenger.showSnackBar(SnackBar(
+      content: Text(t.todoItemRemovedLabel,
+          style: theme.textTheme.bodyLarge!
+              .copyWith(color: theme.colorScheme.onInverseSurface)),
+      behavior: SnackBarBehavior.floating,
+      action: SnackBarAction(
+        label: t.todoItemUndoRemoval,
+        onPressed: () {
+          model.markRemoval(item: marked, remove: false);
+          messenger.hideCurrentSnackBar(
+            reason: SnackBarClosedReason.action,
+          );
+        },
+      ),
+    ));
+    final reason = await controller.closed;
+    if (reason != SnackBarClosedReason.action) {
+      model.remove(item: item);
+    }
   }
 
   TextStyle _getTextStyle(
