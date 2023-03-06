@@ -119,6 +119,9 @@ class SettingsModel with ChangeNotifier {
         ? TimeOfDay(hour: rawFlushAt, minute: 0)
         : _defaultFlushAt;
 
+    final rawIsHaptic = preferences.getBool(_keyIsHaptic);
+    _isHptic = rawIsHaptic ?? false;
+
     notifyListeners();
   }
 }
