@@ -41,7 +41,7 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context)!;
+    final t = AppLocalizations.of(context);
     var theme = Theme.of(context);
     final visibleItems = widget.list.where((i) => !i.toRemove).toList();
 
@@ -52,7 +52,7 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(t.todoItemOutdated,
+          content: Text(t!.todoItemOutdated,
               style: theme.textTheme.bodyLarge!
                   .copyWith(color: theme.colorScheme.onInverseSurface)),
           behavior: SnackBarBehavior.floating,
@@ -84,7 +84,7 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
               },
             )
           : Text(
-              t.todoItemHint,
+              t!.todoItemHint,
               style: theme.textTheme.headlineLarge?.copyWith(
                 color: theme.disabledColor,
               ),

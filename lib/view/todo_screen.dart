@@ -44,7 +44,6 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _pullToRevealController.dispose();
     _focusNode.dispose();
     _limitAnimationController.dispose();
 
@@ -54,8 +53,8 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final todoModel = context.watch<TodoModel>();
-    todoModel.initialize(AppLocalizations.of(context)!);
-    final t = AppLocalizations.of(context)!;
+    todoModel.initialize(AppLocalizations.of(context));
+    final t = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -78,7 +77,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
               behavior: SnackBarBehavior.floating,
               backgroundColor: theme.colorScheme.errorContainer,
               content: Text(
-                t.todoItemMaxCountReached,
+                t!.todoItemMaxCountReached,
                 style: theme.textTheme.bodyLarge!
                     .copyWith(color: theme.colorScheme.onErrorContainer),
               ),

@@ -16,7 +16,9 @@ void main() {
         ChangeNotifierProvider(create: (context) => TodoModel()),
         ChangeNotifierProvider(create: (context) => SettingsModel()),
       ],
-      child: const SimpleTodoApp(),
+      builder: (context, child) {
+        return const SimpleTodoApp();
+      },
     ),
   );
 }
