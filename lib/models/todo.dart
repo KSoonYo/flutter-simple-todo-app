@@ -13,7 +13,8 @@ class TodoModel with ChangeNotifier {
   UnmodifiableListView<Todo> get list => UnmodifiableListView(_list);
   bool get isFull => _list.length >= _maxCount;
 
-  void initialize(AppLocalizations appLocalizations) {
+  void initialize(AppLocalizations? appLocalizations) {
+    if (appLocalizations == null) return;
     if (_initialized) return;
 
     _initialized = true;
