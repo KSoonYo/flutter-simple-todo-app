@@ -25,8 +25,6 @@ void main() {
 
 class SimpleTodoApp extends StatelessWidget {
   const SimpleTodoApp({super.key});
-  static const _defaultLightColorScheme = lightColorScheme;
-  static const _defaultDarkColorScheme = darkColorScheme;
   static const _snackBarThemeData =
       SnackBarThemeData(behavior: SnackBarBehavior.floating);
 
@@ -37,6 +35,8 @@ class SimpleTodoApp extends StatelessWidget {
 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
+        selectedlightColorScheme = lightDynamic;
+        selectedDarkColorScheme = darkDynamic;
         return MaterialApp(
           title: 'Simple Todo',
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -44,7 +44,7 @@ class SimpleTodoApp extends StatelessWidget {
           theme: ThemeData(
               useMaterial3: true,
               snackBarTheme: _snackBarThemeData,
-              colorScheme: lightDynamic ?? _defaultLightColorScheme,
+              colorScheme: selectedlightkColorScheme,
               textTheme: TextTheme(
                   headlineSmall: TextStyle(
                       color: settings.fontColor, fontWeight: FontWeight.w600),
@@ -63,7 +63,7 @@ class SimpleTodoApp extends StatelessWidget {
           darkTheme: ThemeData(
               useMaterial3: true,
               snackBarTheme: _snackBarThemeData,
-              colorScheme: darkDynamic ?? _defaultDarkColorScheme,
+              colorScheme: selectedDarkColorScheme,
               textTheme: TextTheme(
                   headlineSmall: TextStyle(
                       color: settings.fontColor, fontWeight: FontWeight.w600),

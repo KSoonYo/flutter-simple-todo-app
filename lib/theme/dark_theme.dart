@@ -18,3 +18,11 @@ const darkColorScheme = ColorScheme.dark(
     onSurfaceVariant: Color(0xffc7c5d0),
     inverseSurface: Color(0xffe4e1e6),
     onInverseSurface: Color(0xff1b1b1f));
+
+ColorScheme _selectedDarkColorScheme = darkColorScheme;
+
+ColorScheme get selectedDarkColorScheme => _selectedDarkColorScheme;
+set selectedDarkColorScheme(ColorScheme? dynamicDarkColors) {
+  if (dynamicDarkColors == null) return;
+  _selectedDarkColorScheme = dynamicDarkColors;
+}
