@@ -33,7 +33,6 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 86),
               Expanded(
                 child: ListView(
-                  physics: const ClampingScrollPhysics(),
                   shrinkWrap: true,
                   children: <Widget>[
                     model.themeMode == ThemeMode.dark
