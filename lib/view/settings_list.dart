@@ -3,6 +3,8 @@ import 'package:simple_todo/models/settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:flutter_svg/svg.dart';
+import 'package:simple_todo/theme/dark_theme.dart';
+import 'package:simple_todo/theme/light_theme.dart';
 
 typedef ChangeSettingsCallback = void Function(ChangeSettingsDetail detail);
 
@@ -81,7 +83,7 @@ class _SettingsListState extends State<SettingsList> {
       theme.colorScheme.onSurface,
       theme.colorScheme.copyWith(primary: const Color(0xff4455ba)).primary,
       theme.colorScheme.copyWith(secondary: const Color(0xff5b5d72)).secondary,
-      theme.colorScheme.tertiary,
+      theme.colorScheme.copyWith(tertiary: const Color(0xff77536d)).tertiary,
       theme.colorScheme.copyWith(primary: const Color(0xff7889f1)).primary,
       theme.colorScheme.copyWith(secondary: const Color(0xff8d8fa6)).secondary
     ];
@@ -138,8 +140,14 @@ class _SettingsListState extends State<SettingsList> {
                   showSelectedIcon: true,
                   selected: {widget.themeMode!},
                   onSelectionChanged: (selected) {
-                    _handleChangedSettings(
-                        _settingsDetail?.copyWith(themeMode: selected.first));
+                    Color? newFontColor;
+                    if (selected.first == ThemeMode.light) {
+                      newFontColor = selectedLightColorScheme.onSurface;
+                    } else {
+                      newFontColor = selectedDarkColorScheme.onSurface;
+                    }
+                    _handleChangedSettings(_settingsDetail?.copyWith(
+                        themeMode: selected.first, fontColor: newFontColor));
                   },
                 ),
               ),
