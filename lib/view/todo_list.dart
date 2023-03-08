@@ -25,42 +25,55 @@ class TodoList extends StatefulWidget {
   State<TodoList> createState() => _TodoListState();
 }
 
-class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
+class _TodoListState extends State<TodoList>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late AnimatedListController _controller;
   late bool outdated;
 
   @override
   void initState() {
     super.initState();
+    var settings = context.read<SettingsModel>();
 
     _controller = widget.controller ?? AnimatedListController();
+    WidgetsBinding.instance.addObserver(this);
+    outdated = _isOutdated(settings);
+  }
 
-    final settingsModel = context.read<SettingsModel>();
-    outdated = _isOutdated(settingsModel);
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    var settings = context.read<SettingsModel>();
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        outdated = _isOutdated(settings);
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant TodoList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    var settings = context.read<SettingsModel>();
+    setState(() {
+      outdated = _isOutdated(settings);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // build 완료 후 한번 만 실행
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onAfterBuild(context));
+
     final t = AppLocalizations.of(context);
     var theme = Theme.of(context);
     final visibleItems = widget.list.where((i) => !i.toRemove).toList();
-
-    if (outdated) {
-      outdated = false;
-
-      final todoModel = context.read<TodoModel>();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(t!.todoItemOutdated,
-              style: theme.textTheme.bodyLarge!
-                  .copyWith(color: theme.colorScheme.onInverseSurface)),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(days: 1),
-          onVisible: () => todoModel.clear(),
-        ),
-      );
-    }
 
     return Center(
       child: visibleItems.isNotEmpty
@@ -103,5 +116,29 @@ class _TodoListState extends State<TodoList> with TickerProviderStateMixin {
     );
 
     return now.isAfter(flush) && settingsModel.lastFlushed.isBefore(flush);
+  }
+
+  void _onAfterBuild(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    var theme = Theme.of(context);
+
+    if (outdated) {
+      outdated = false;
+      final settingsModel = context.read<SettingsModel>();
+      final todoModel = context.read<TodoModel>();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t!.todoItemOutdated,
+              style: theme.textTheme.bodyLarge!
+                  .copyWith(color: theme.colorScheme.onInverseSurface)),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(days: 1),
+          onVisible: () => todoModel.clear(),
+        ),
+      );
+
+      settingsModel.lastFlushed = DateTime.now();
+    }
   }
 }
