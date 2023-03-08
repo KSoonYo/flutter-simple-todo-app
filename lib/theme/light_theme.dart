@@ -17,10 +17,10 @@ const lightColorScheme = ColorScheme.highContrastLight(
     onInverseSurface: Color(0xfff3f0f4),
     onSurfaceVariant: Color(0xff46464F));
 
-ColorScheme _selectedlightColorScheme = lightColorScheme;
+ColorScheme _selectedLightColorScheme = lightColorScheme;
 
-ColorScheme get selectedlightkColorScheme => _selectedlightColorScheme;
-set selectedlightColorScheme(ColorScheme? dynamiclightColors) {
-  if (dynamiclightColors == null) return;
-  _selectedlightColorScheme = dynamiclightColors;
+ColorScheme get selectedLightColorScheme => _selectedLightColorScheme;
+set selectedLightColorScheme(ColorScheme? dynamicLightColors) {
+  if (dynamicLightColors == null) return;
+  _selectedLightColorScheme = dynamicLightColors;
 }

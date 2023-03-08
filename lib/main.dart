@@ -35,7 +35,7 @@ class SimpleTodoApp extends StatelessWidget {
 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
-        selectedlightColorScheme = lightDynamic;
+        selectedLightColorScheme = lightDynamic;
         selectedDarkColorScheme = darkDynamic;
         return MaterialApp(
           title: 'Simple Todo',
@@ -44,7 +44,7 @@ class SimpleTodoApp extends StatelessWidget {
           theme: ThemeData(
               useMaterial3: true,
               snackBarTheme: _snackBarThemeData,
-              colorScheme: selectedlightkColorScheme,
+              colorScheme: selectedLightColorScheme,
               textTheme: TextTheme(
                   headlineSmall: TextStyle(
                       color: settings.fontColor, fontWeight: FontWeight.w600),
