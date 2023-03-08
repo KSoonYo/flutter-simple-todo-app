@@ -38,6 +38,7 @@ class TodoItem extends StatelessWidget {
             item.content,
             style: style,
             maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
