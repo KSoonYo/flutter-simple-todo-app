@@ -110,6 +110,11 @@ class _SettingsListState extends State<SettingsList> {
         const SizedBox(height: 86),
         Expanded(
           child: ListView(
+            // Ensure the parent widget is always scrollable regardless of this child list view physics.
+            // because the ancestor widget is NotificationListener for listening over scroll notifications.
+            // that need a scrollable child widget with no clamping scroll boundary.
+            physics: const ClampingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
             shrinkWrap: true,
             children: <Widget>[
               widget.themeMode == ThemeMode.dark

@@ -175,6 +175,11 @@ class _PullToRevealState extends State<PullToReveal>
           SlideTransition(
             key: _bottomChildKey,
             position: _pullUpAnimation,
+            // ---------------------------------------------------------------------------------
+            // android 기종의 경우, 기본적으로 scrollable widget에 대해 ClampingScrollPhysics
+            // 따라서 리스트뷰가 위젯 스크린 높이에 맞게 들어가서 스크롤이 발생하지 않으면 스크롤 바운더리가 변경되지 않음
+            // -> over scroll notification이 일어나지 않는 문제 발생
+            //----------------------------------------------------------------------------------
             child: NotificationListener<OverscrollNotification>(
               onNotification: (notification) {
                 // check if user is scrolling down from the top
