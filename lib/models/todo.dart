@@ -4,15 +4,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class TodoModel with ChangeNotifier {
   static const _maxCount = 5;
   static const _keyCache = 'cache';
+  static const uuid = Uuid();
 
   late Map<String, dynamic>? _cacheTable;
-
+  late String _nextIndex;
   bool _initialized = false;
-  int _nextIndex = 0;
   Cache? _cache;
   List<Todo> _list = [];
 
@@ -23,19 +24,20 @@ class TodoModel with ChangeNotifier {
   void initialize(AppLocalizations? appLocalizations) async {
     if (appLocalizations == null) return;
     if (_initialized) return;
+
     await _load();
 
     _initialized = true;
 
     if (_cache == null) {
       _list = [
-        Todo(id: 0, content: appLocalizations.todoDefaultItem1),
-        Todo(id: 1, content: appLocalizations.todoDefaultItem2),
-        Todo(id: 2, content: appLocalizations.todoDefaultItem3),
-        Todo(id: 3, content: appLocalizations.todoDefaultItem4),
-        Todo(id: 4, content: appLocalizations.todoDefaultItem5),
+        Todo(id: uuid.v4(), content: appLocalizations.todoDefaultItem1),
+        Todo(id: uuid.v4(), content: appLocalizations.todoDefaultItem2),
+        Todo(id: uuid.v4(), content: appLocalizations.todoDefaultItem3),
+        Todo(id: uuid.v4(), content: appLocalizations.todoDefaultItem4),
+        Todo(id: uuid.v4(), content: appLocalizations.todoDefaultItem5),
       ];
-      _nextIndex = _list.length;
+      _nextIndex = uuid.v4();
       _cacheTable = {
         'list': _list.map((todo) => todo.toJson()).toList(),
         'nextIndex': _nextIndex
@@ -56,7 +58,7 @@ class TodoModel with ChangeNotifier {
     if (isFull) return; // should we just throw?
 
     _list.add(Todo(id: _nextIndex, content: content));
-    _nextIndex = _list.length;
+    _nextIndex = uuid.v4();
     cacheUpdate(_list, _nextIndex);
   }
 
@@ -104,7 +106,7 @@ class TodoModel with ChangeNotifier {
     cacheUpdate(_list, _nextIndex);
   }
 
-  void cacheUpdate(List<Todo> list, int nextIndex) {
+  void cacheUpdate(List<Todo> list, String nextIndex) {
     _cacheTable = {
       'list': list.map((todo) => todo.toJson()).toList(),
       'nextIndex': nextIndex
@@ -132,6 +134,7 @@ class TodoModel with ChangeNotifier {
     final rawCacheData = preferences.getString(_keyCache);
     debugPrint('raw cache data: $rawCacheData');
     _cacheTable = rawCacheData != null ? jsonDecode(rawCacheData) : null;
+    debugPrint('cache table: $_cacheTable');
     _cache = _cacheTable != null ? Cache.fromJson(_cacheTable!) : null;
 
     notifyListeners();
@@ -139,7 +142,7 @@ class TodoModel with ChangeNotifier {
 }
 
 class Todo {
-  final int id;
+  final String id;
   final String content;
   final bool archived;
   final bool toRemove;
@@ -176,7 +179,7 @@ class Todo {
 
 class Cache {
   final List<Todo> list;
-  final int nextIndex;
+  final String nextIndex;
 
   Cache(this.list, this.nextIndex);
 
