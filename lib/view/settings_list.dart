@@ -40,7 +40,7 @@ class ChangeSettingsDetail {
     this.themeMode = ThemeMode.light,
   });
   final ThemeMode themeMode;
-  final Color fontColor;
+  final Color? fontColor;
   final FontSize fontSize;
   final TimeOfDay flushAt;
   final bool isHaptic;
@@ -66,7 +66,7 @@ class _SettingsListState extends State<SettingsList> {
   void initState() {
     super.initState();
     _settingsDetail = ChangeSettingsDetail(
-        fontColor: widget.fontColor!,
+        fontColor: widget.fontColor,
         fontSize: widget.fontSize!,
         flushAt: widget.flushAt!,
         isHaptic: widget.isHaptic!,
