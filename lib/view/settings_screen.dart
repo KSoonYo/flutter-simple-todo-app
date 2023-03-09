@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_todo/view/settings_list.dart';
 
@@ -11,7 +10,6 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SettingsModel model = context.watch<SettingsModel>();
-    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Center(
