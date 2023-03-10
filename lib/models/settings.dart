@@ -61,7 +61,7 @@ class SettingsModel with ChangeNotifier {
 
   TimeOfDay get flushAt => _flushAt;
   set flushAt(TimeOfDay value) {
-    _store(_keyFlushAt, value.hour);
+    _store(_keyFlushAt, '${value.hour}:${value.minute}');
 
     _flushAt = value;
     notifyListeners();
@@ -97,6 +97,7 @@ class SettingsModel with ChangeNotifier {
   }
 
   Future<void> _load<T>() async {
+    debugPrint('settings info loading...');
     final preferences = await _prefs;
 
     _themeMode = ThemeMode
@@ -114,9 +115,11 @@ class SettingsModel with ChangeNotifier {
         ? DateTime.fromMillisecondsSinceEpoch(rawLastFlushed)
         : _defaultLastFlushed;
 
-    final rawFlushAt = preferences.getInt(_keyFlushAt);
+    final rawFlushAt = preferences.getString(_keyFlushAt);
     _flushAt = rawFlushAt != null
-        ? TimeOfDay(hour: rawFlushAt, minute: 0)
+        ? TimeOfDay(
+            hour: int.parse(rawFlushAt.split(':')[0]),
+            minute: int.parse(rawFlushAt.split(':')[1]))
         : _defaultFlushAt;
 
     final rawIsHaptic = preferences.getBool(_keyIsHaptic);
