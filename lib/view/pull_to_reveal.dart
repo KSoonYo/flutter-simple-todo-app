@@ -268,7 +268,10 @@ class _PullToRevealState extends State<PullToReveal>
     _dragStartDetails = null;
 
     final direction = _controller.direction;
-    if (_controller.state != RevealState.revealing || direction == null) return;
+    if (_controller.state != RevealState.revealing || direction == null) {
+      _controller.state = RevealState.idle;
+      return;
+    }
 
     final velocity = details.primaryVelocity;
 
