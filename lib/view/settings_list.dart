@@ -93,7 +93,10 @@ class _SettingsListState extends State<SettingsList> {
     if (newDetails == null) return;
     if (widget.onChange != null) {
       widget.onChange?.call(newDetails);
+      _settingsDetail = newDetails;
+      return;
     }
+
     setState(() {
       _settingsDetail = newDetails;
     });
@@ -104,7 +107,6 @@ class _SettingsListState extends State<SettingsList> {
     var theme = Theme.of(context);
     final t = AppLocalizations.of(context)!;
     List<Color> colorPallet = _getColorPallet(theme);
-
     return Column(
       children: [
         const SizedBox(height: 86),
@@ -151,6 +153,7 @@ class _SettingsListState extends State<SettingsList> {
                     } else {
                       newFontColor = selectedDarkColorScheme.onSurface;
                     }
+                    ScaffoldMessenger.of(context).clearSnackBars();
                     _handleChangedSettings(_settingsDetail?.copyWith(
                         themeMode: selected.first, fontColor: newFontColor));
                   },
@@ -172,8 +175,10 @@ class _SettingsListState extends State<SettingsList> {
                       for (Color color in colorPallet)
                         GestureDetector(
                           onTap: () {
-                            _handleChangedSettings(
-                                _settingsDetail?.copyWith(fontColor: color));
+                            if (_settingsDetail!.fontColor != color) {
+                              _handleChangedSettings(
+                                  _settingsDetail?.copyWith(fontColor: color));
+                            }
                           },
                           child: Container(
                               margin: const EdgeInsets.only(right: 12),
