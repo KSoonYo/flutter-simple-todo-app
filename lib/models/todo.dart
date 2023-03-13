@@ -19,6 +19,7 @@ class TodoModel with ChangeNotifier {
 
   UnmodifiableListView<Todo> get list => UnmodifiableListView(_list);
   bool get isFull => _list.length >= _maxCount;
+  Cache? get cache => _cache;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   void initialize(AppLocalizations? appLocalizations) async {
@@ -98,6 +99,11 @@ class TodoModel with ChangeNotifier {
     final item = _list.removeAt(from);
     if (from < to) to--;
     _list.insert(to, item);
+    cacheUpdate(_list, _nextIndex);
+  }
+
+  void update(List<Todo> newList) {
+    _list = newList;
     cacheUpdate(_list, _nextIndex);
   }
 

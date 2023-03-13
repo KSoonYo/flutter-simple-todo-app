@@ -85,7 +85,8 @@ class _TodoListState extends State<TodoList>
                     a.archived == b.archived &&
                     a.toRemove == b.toRemove,
               ),
-              reorderModel: AutomaticAnimatedListReorderModel(visibleItems),
+              reorderModel: CustomAutomaticAnimatedListReorderModel(
+                  context, visibleItems),
               shrinkWrap: true,
               list: visibleItems,
               listController: _controller,
@@ -120,12 +121,12 @@ class _TodoListState extends State<TodoList>
 
   void _onAfterBuild(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final settingsModel = context.read<SettingsModel>();
+    final todoModel = context.read<TodoModel>();
     var theme = Theme.of(context);
 
-    if (outdated) {
+    if (todoModel.cache != null && outdated) {
       outdated = false;
-      final settingsModel = context.read<SettingsModel>();
-      final todoModel = context.read<TodoModel>();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -140,5 +141,32 @@ class _TodoListState extends State<TodoList>
 
       settingsModel.lastFlushed = DateTime.now();
     }
+  }
+}
+
+class CustomAutomaticAnimatedListReorderModel<T>
+    extends AnimatedListBaseReorderModel {
+  const CustomAutomaticAnimatedListReorderModel(this.context, this.list);
+
+  final BuildContext context;
+  final List<Todo> list;
+
+  @override
+  bool onReorderStart(int index, double dx, double dy) => true;
+
+  @override
+  Object? onReorderFeedback(
+          int index, int dropIndex, double offset, double dx, double dy) =>
+      null;
+
+  @override
+  bool onReorderMove(int index, int dropIndex) => true;
+
+  @override
+  bool onReorderComplete(int index, int dropIndex, Object? slot) {
+    var todoModel = context.read<TodoModel>();
+    list.insert(dropIndex, list.removeAt(index));
+    todoModel.update(list);
+    return true;
   }
 }
