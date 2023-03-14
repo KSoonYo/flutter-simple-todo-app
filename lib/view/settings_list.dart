@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:simple_todo/models/settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -269,6 +270,7 @@ class _SettingsListState extends State<SettingsList> {
                     trailing: Switch(
                       value: widget.isHaptic!,
                       onChanged: (value) {
+                        if (value) HapticFeedback.vibrate();
                         _handleChangedSettings(
                             _settingsDetail?.copyWith(isHaptic: value));
                       },

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_todo/models/settings.dart';
 import 'package:simple_todo/view/settings_screen.dart';
 import 'package:simple_todo/view/todo_input.dart';
 
@@ -53,9 +55,11 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final todoModel = context.watch<TodoModel>();
+    final settingsModel = context.read<SettingsModel>();
     todoModel.initialize(AppLocalizations.of(context));
     final t = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    var isHaptic = settingsModel.isHaptic;
 
     return Scaffold(
       body: PullToReveal(
@@ -64,14 +68,16 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
           ScaffoldMessenger.of(context).clearSnackBars();
 
           if (direction != PullDirection.down || !todoModel.isFull) return true;
-
           _limitAnimationController
               .forward()
               .then((_) => _limitAnimationController.reset());
-
+          if (isHaptic) {
+            HapticFeedback.heavyImpact();
+          }
           final messenger = ScaffoldMessenger.of(context);
 
           messenger.clearSnackBars();
+
           messenger.showSnackBar(
             SnackBar(
               behavior: SnackBarBehavior.floating,
@@ -93,6 +99,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
             _editingItem = null;
           });
         },
+        isHaptic: isHaptic,
         topChild: SafeArea(
           child: FractionallySizedBox(
             heightFactor: 0.5,

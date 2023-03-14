@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:great_list_view/great_list_view.dart';
 import 'package:provider/provider.dart';
@@ -152,7 +153,13 @@ class CustomAutomaticAnimatedListReorderModel<T>
   final List<Todo> list;
 
   @override
-  bool onReorderStart(int index, double dx, double dy) => true;
+  bool onReorderStart(int index, double dx, double dy) {
+    var settingsModel = context.read<SettingsModel>();
+    if (settingsModel.isHaptic) {
+      HapticFeedback.vibrate();
+    }
+    return true;
+  }
 
   @override
   Object? onReorderFeedback(

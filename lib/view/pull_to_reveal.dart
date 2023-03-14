@@ -56,18 +56,19 @@ class PullToReveal extends StatefulWidget {
   static const defaultRevealDragDistanceThreshold = 0.4;
   static const defaultRevealDragVelocityThreshold = 700.0;
 
-  const PullToReveal({
-    super.key,
-    this.topChild,
-    this.bottomChild,
-    required this.child,
-    this.onReveal,
-    this.onHide,
-    this.onRevealing,
-    this.controller,
-    this.revealDragDistanceThreshold = defaultRevealDragDistanceThreshold,
-    this.revealDragVelocityThreshold = defaultRevealDragVelocityThreshold,
-  }) : assert(topChild != null || bottomChild != null);
+  const PullToReveal(
+      {super.key,
+      this.topChild,
+      this.bottomChild,
+      required this.child,
+      this.onReveal,
+      this.onHide,
+      this.onRevealing,
+      this.controller,
+      this.revealDragDistanceThreshold = defaultRevealDragDistanceThreshold,
+      this.revealDragVelocityThreshold = defaultRevealDragVelocityThreshold,
+      this.isHaptic = false})
+      : assert(topChild != null || bottomChild != null);
 
   final Widget? topChild;
   final Widget? bottomChild;
@@ -78,6 +79,7 @@ class PullToReveal extends StatefulWidget {
   final RevealingCallback? onRevealing;
   final double revealDragDistanceThreshold;
   final double revealDragVelocityThreshold;
+  final bool isHaptic;
 
   @override
   State<PullToReveal> createState() => _PullToRevealState();
@@ -121,11 +123,12 @@ class _PullToRevealState extends State<PullToReveal>
       switch (_controller.state) {
         case RevealState.topRevealed:
         case RevealState.bottomRevealed:
-          await _animationController.forward();
+          _animationController.forward();
           widget.onReveal?.call();
           break;
         case RevealState.idle:
-          await _animationController.reverse();
+          await _animationController
+              .reverse(); // must have await keyword cause of onHide callback may have setstate
           widget.onHide?.call();
           break;
         case RevealState.revealing:
@@ -223,7 +226,9 @@ class _PullToRevealState extends State<PullToReveal>
   void _handleDragStart(DragStartDetails details) {
     _dragStartDetails = details;
 
-    if (_controller.state == RevealState.idle) HapticFeedback.lightImpact();
+    if (_controller.state == RevealState.idle && widget.isHaptic) {
+      HapticFeedback.lightImpact();
+    }
 
     _controller.state = RevealState.revealing;
   }
@@ -291,7 +296,9 @@ class _PullToRevealState extends State<PullToReveal>
         ? RevealState.topRevealed
         : RevealState.bottomRevealed;
 
-    HapticFeedback.heavyImpact();
+    if (widget.isHaptic) {
+      HapticFeedback.heavyImpact();
+    }
   }
 
   void _handleDragCancel() {
