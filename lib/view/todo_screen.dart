@@ -88,8 +88,10 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
         },
         onReveal: () => _focusNode.requestFocus(),
         onHide: () {
-          _editingItem = null;
           _focusNode.unfocus();
+          setState(() {
+            _editingItem = null;
+          });
         },
         topChild: SafeArea(
           child: FractionallySizedBox(

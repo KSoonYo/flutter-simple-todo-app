@@ -84,7 +84,7 @@ class PullToReveal extends StatefulWidget {
 }
 
 class _PullToRevealState extends State<PullToReveal>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final GlobalKey _topChildKey = GlobalKey();
   final GlobalKey _bottomChildKey = GlobalKey();
   late PullToRevealController _controller;
@@ -96,6 +96,9 @@ class _PullToRevealState extends State<PullToReveal>
 
   DragStartDetails? _dragStartDetails;
   var _barrierVisible = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -118,12 +121,12 @@ class _PullToRevealState extends State<PullToReveal>
       switch (_controller.state) {
         case RevealState.topRevealed:
         case RevealState.bottomRevealed:
-          widget.onReveal?.call();
           await _animationController.forward();
+          widget.onReveal?.call();
           break;
         case RevealState.idle:
-          widget.onHide?.call();
           await _animationController.reverse();
+          widget.onHide?.call();
           break;
         case RevealState.revealing:
           break;
@@ -144,6 +147,8 @@ class _PullToRevealState extends State<PullToReveal>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     _barrierColorAnimation = _animationController.drive(
       ColorTween(
         end: Theme.of(context).scaffoldBackgroundColor,
@@ -163,7 +168,7 @@ class _PullToRevealState extends State<PullToReveal>
         if (_barrierVisible)
           AnimatedModalBarrier(
             color: _barrierColorAnimation,
-            onDismiss: () => _controller.state = RevealState.idle,
+            onDismiss: () => _controller.hide(),
           ),
         if (_shouldShowTopChild)
           SlideTransition(
