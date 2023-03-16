@@ -31,4 +31,3 @@ flutter:
   generate: true
   assets:
     - assets/logo.svg
-    - assets/logo_dark.svg

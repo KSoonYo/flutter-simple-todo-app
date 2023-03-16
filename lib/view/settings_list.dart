@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_todo/models/settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:flutter_svg/svg.dart';
-import 'package:simple_todo/theme/dark_theme.dart';
-import 'package:simple_todo/theme/light_theme.dart';
+import '../models/settings.dart';
+import '../theme/dark_theme.dart';
+import '../theme/light_theme.dart';
+import 'logo.dart';
 
 typedef ChangeSettingsCallback = void Function(ChangeSettingsDetail detail);
 
@@ -129,9 +129,7 @@ class _SettingsListState extends State<SettingsList> {
                 parent: AlwaysScrollableScrollPhysics()),
             shrinkWrap: true,
             children: <Widget>[
-              widget.themeMode == ThemeMode.dark
-                  ? SvgPicture.asset('assets/logo_dark.svg')
-                  : SvgPicture.asset('assets/logo.svg'),
+              const Logo(),
               SizedBox(
                 height: 72,
                 child: ListTile(
