@@ -7,6 +7,7 @@ import 'models/settings.dart';
 import 'models/todo.dart';
 import 'theme/dark_theme.dart';
 import 'theme/light_theme.dart';
+import 'theme/text.dart';
 import 'view/todo_screen.dart';
 
 void main() {
@@ -30,8 +31,8 @@ class SimpleTodoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<SettingsModel>();
-    final themeMode = settings.themeMode;
+    final themeMode = context
+        .select<SettingsModel, ThemeMode>((settings) => settings.themeMode);
 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
@@ -42,43 +43,17 @@ class SimpleTodoApp extends StatelessWidget {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
-              useMaterial3: true,
-              snackBarTheme: _snackBarThemeData,
-              colorScheme: selectedLightColorScheme,
-              textTheme: TextTheme(
-                  headlineSmall: TextStyle(
-                      color: settings.fontColor, fontWeight: FontWeight.w600),
-                  headlineMedium: TextStyle(
-                      color: settings.fontColor, fontWeight: FontWeight.w600),
-                  headlineLarge: TextStyle(
-                      color: settings.fontColor, fontWeight: FontWeight.w600),
-                  titleLarge: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.w600),
-                  labelLarge: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500),
-                  bodyLarge: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                  bodyMedium: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500))),
+            useMaterial3: true,
+            snackBarTheme: _snackBarThemeData,
+            colorScheme: selectedLightColorScheme,
+            textTheme: textTheme,
+          ),
           darkTheme: ThemeData(
-              useMaterial3: true,
-              snackBarTheme: _snackBarThemeData,
-              colorScheme: selectedDarkColorScheme,
-              textTheme: TextTheme(
-                  headlineSmall: TextStyle(
-                      color: settings.fontColor, fontWeight: FontWeight.w600),
-                  headlineMedium: TextStyle(
-                      color: settings.fontColor, fontWeight: FontWeight.w600),
-                  headlineLarge: TextStyle(
-                      color: settings.fontColor, fontWeight: FontWeight.w600),
-                  titleLarge: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.w600),
-                  labelLarge: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500),
-                  bodyLarge: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                  bodyMedium: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500))),
+            useMaterial3: true,
+            snackBarTheme: _snackBarThemeData,
+            colorScheme: selectedDarkColorScheme,
+            textTheme: textTheme,
+          ),
           themeMode: themeMode,
           home: const TodoScreen(),
         );

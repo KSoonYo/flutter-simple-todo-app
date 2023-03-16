@@ -20,10 +20,7 @@ class TodoItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.read<TodoModel>();
-    final fontSize =
-        context.select<SettingsModel, FontSize>((model) => model.fontSize);
-
-    final TextStyle style = _getTextStyle(context, item.archived, fontSize);
+    final TextStyle style = _getTextStyle(context, item.archived);
 
     final Size textSize = getTextSize(item.content, style);
 
@@ -89,13 +86,13 @@ class TodoItem extends StatelessWidget {
     }
   }
 
-  TextStyle _getTextStyle(
-      BuildContext context, bool disabled, FontSize fontSize) {
+  TextStyle _getTextStyle(BuildContext context, bool disabled) {
     final theme = Theme.of(context);
+    final model = context.watch<SettingsModel>();
 
     TextStyle style;
 
-    switch (fontSize) {
+    switch (model.fontSize) {
       case FontSize.small:
         style = theme.textTheme.headlineSmall!;
         break;
@@ -106,11 +103,13 @@ class TodoItem extends StatelessWidget {
         style = theme.textTheme.headlineLarge!;
         break;
       default:
-        throw UnsupportedError('Unsupported font size $fontSize');
+        throw UnsupportedError('Unsupported font size $model.fontSize');
     }
 
     if (disabled) {
       style = style.copyWith(color: theme.disabledColor);
+    } else {
+      style = style.copyWith(color: model.fontColor);
     }
     return style;
   }

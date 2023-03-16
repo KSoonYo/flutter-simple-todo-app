@@ -123,14 +123,26 @@ class _TodoInputState extends State<TodoInput>
   }
 
   TextStyle _getTextStyle(BuildContext context) {
-    final fontSize =
-        context.select<SettingsModel, FontSize>((value) => value.fontSize);
     final theme = Theme.of(context);
+    final model = context.watch<SettingsModel>();
 
-    return (fontSize == FontSize.small
-        ? theme.textTheme.headlineSmall
-        : fontSize == FontSize.medium
-            ? theme.textTheme.headlineMedium
-            : theme.textTheme.headlineLarge)!;
+    TextStyle style;
+
+    switch (model.fontSize) {
+      case FontSize.small:
+        style = theme.textTheme.headlineSmall!;
+        break;
+      case FontSize.medium:
+        style = theme.textTheme.headlineMedium!;
+        break;
+      case FontSize.large:
+        style = theme.textTheme.headlineLarge!;
+        break;
+      default:
+        throw UnsupportedError('Unsupported font size $model.fontSize');
+    }
+
+    style = style.copyWith(color: model.fontColor);
+    return style;
   }
 }
