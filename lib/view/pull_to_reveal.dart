@@ -56,19 +56,19 @@ class PullToReveal extends StatefulWidget {
   static const defaultRevealDragDistanceThreshold = 0.4;
   static const defaultRevealDragVelocityThreshold = 700.0;
 
-  const PullToReveal(
-      {super.key,
-      this.topChild,
-      this.bottomChild,
-      required this.child,
-      this.onReveal,
-      this.onHide,
-      this.onRevealing,
-      this.controller,
-      this.revealDragDistanceThreshold = defaultRevealDragDistanceThreshold,
-      this.revealDragVelocityThreshold = defaultRevealDragVelocityThreshold,
-      this.isHaptic = false})
-      : assert(topChild != null || bottomChild != null);
+  const PullToReveal({
+    super.key,
+    this.topChild,
+    this.bottomChild,
+    required this.child,
+    this.onReveal,
+    this.onHide,
+    this.onRevealing,
+    this.controller,
+    this.revealDragDistanceThreshold = defaultRevealDragDistanceThreshold,
+    this.revealDragVelocityThreshold = defaultRevealDragVelocityThreshold,
+    this.hapticEnabled = false,
+  }) : assert(topChild != null || bottomChild != null);
 
   final Widget? topChild;
   final Widget? bottomChild;
@@ -79,7 +79,7 @@ class PullToReveal extends StatefulWidget {
   final RevealingCallback? onRevealing;
   final double revealDragDistanceThreshold;
   final double revealDragVelocityThreshold;
-  final bool isHaptic;
+  final bool hapticEnabled;
 
   @override
   State<PullToReveal> createState() => _PullToRevealState();
@@ -226,7 +226,7 @@ class _PullToRevealState extends State<PullToReveal>
   void _handleDragStart(DragStartDetails details) {
     _dragStartDetails = details;
 
-    if (_controller.state == RevealState.idle && widget.isHaptic) {
+    if (_controller.state == RevealState.idle && widget.hapticEnabled) {
       HapticFeedback.lightImpact();
     }
 
@@ -296,7 +296,7 @@ class _PullToRevealState extends State<PullToReveal>
         ? RevealState.topRevealed
         : RevealState.bottomRevealed;
 
-    if (widget.isHaptic) {
+    if (widget.hapticEnabled) {
       HapticFeedback.heavyImpact();
     }
   }

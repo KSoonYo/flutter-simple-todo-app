@@ -20,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
           selectedFontColorIndex: model.selectedFontColorIndex,
           fontSize: model.fontSize,
           flushAt: model.flushAt,
-          isHaptic: model.hapticEnabled,
+          hapticEnabled: model.hapticEnabled,
           onChange: (detail) {
             model.themeMode = detail.themeMode;
             model.fontColor = detail.fontColor;

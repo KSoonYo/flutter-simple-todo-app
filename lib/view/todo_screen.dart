@@ -60,7 +60,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     todoModel.initialize(AppLocalizations.of(context));
     final t = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    var isHaptic = settingsModel.hapticEnabled;
+    var hapticEnabled = settingsModel.hapticEnabled;
 
     return Scaffold(
       body: PullToReveal(
@@ -72,7 +72,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
           _limitAnimationController
               .forward()
               .then((_) => _limitAnimationController.reset());
-          if (isHaptic) {
+          if (hapticEnabled) {
             HapticFeedback.heavyImpact();
           }
           final messenger = ScaffoldMessenger.of(context);
@@ -100,7 +100,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
             _editingItem = null;
           });
         },
-        isHaptic: isHaptic,
+        hapticEnabled: hapticEnabled,
         topChild: SafeArea(
           child: FractionallySizedBox(
             heightFactor: 0.5,

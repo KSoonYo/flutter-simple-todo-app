@@ -16,7 +16,7 @@ class SettingsList extends StatefulWidget {
     required this.fontSize,
     required this.flushAt,
     this.selectedFontColorIndex = 0,
-    this.isHaptic = false,
+    this.hapticEnabled = false,
     this.themeMode = ThemeMode.light,
     this.onChange,
   });
@@ -26,7 +26,7 @@ class SettingsList extends StatefulWidget {
   final int selectedFontColorIndex;
   final FontSize? fontSize;
   final TimeOfDay? flushAt;
-  final bool? isHaptic;
+  final bool? hapticEnabled;
 
   final ChangeSettingsCallback? onChange;
 
@@ -81,7 +81,7 @@ class _SettingsListState extends State<SettingsList> {
         selectedFontColorIndex: widget.selectedFontColorIndex,
         fontSize: widget.fontSize!,
         flushAt: widget.flushAt!,
-        hapticEnabled: widget.isHaptic!,
+        hapticEnabled: widget.hapticEnabled!,
         themeMode: widget.themeMode!);
   }
 
@@ -280,7 +280,7 @@ class _SettingsListState extends State<SettingsList> {
                         style: theme.textTheme.titleLarge),
                     subtitle: Text(t.settingsHapticSubtitle),
                     trailing: Switch(
-                      value: widget.isHaptic!,
+                      value: widget.hapticEnabled!,
                       onChanged: (value) {
                         if (value) HapticFeedback.vibrate();
                         _handleChangedSettings(
