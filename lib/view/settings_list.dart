@@ -85,11 +85,6 @@ class _SettingsListState extends State<SettingsList> {
         themeMode: widget.themeMode!);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   List<Color> _getColorPalette(ThemeData theme) {
     return [
       theme.colorScheme.onSurface,
