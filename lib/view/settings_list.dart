@@ -15,6 +15,7 @@ class SettingsList extends StatefulWidget {
     required this.fontColor,
     required this.fontSize,
     required this.flushAt,
+    this.selectedFontColorIndex = 0,
     this.isHaptic = false,
     this.themeMode = ThemeMode.light,
     this.onChange,
@@ -22,6 +23,7 @@ class SettingsList extends StatefulWidget {
 
   final ThemeMode? themeMode;
   final Color? fontColor;
+  final int selectedFontColorIndex;
   final FontSize? fontSize;
   final TimeOfDay? flushAt;
   final bool? isHaptic;
@@ -37,11 +39,13 @@ class ChangeSettingsDetail {
     required this.fontColor,
     required this.fontSize,
     required this.flushAt,
+    this.selectedFontColorIndex = 0,
     this.isHaptic = false,
     this.themeMode = ThemeMode.light,
   });
   final ThemeMode themeMode;
   final Color? fontColor;
+  final int selectedFontColorIndex;
   final FontSize fontSize;
   final TimeOfDay flushAt;
   final bool isHaptic;
@@ -49,12 +53,15 @@ class ChangeSettingsDetail {
   ChangeSettingsDetail copyWith(
       {ThemeMode? themeMode,
       Color? fontColor,
+      int? selectedFontColorIndex,
       FontSize? fontSize,
       TimeOfDay? flushAt,
       bool? isHaptic}) {
     return ChangeSettingsDetail(
         themeMode: themeMode ?? this.themeMode,
         fontColor: fontColor ?? this.fontColor,
+        selectedFontColorIndex:
+            selectedFontColorIndex ?? this.selectedFontColorIndex,
         fontSize: fontSize ?? this.fontSize,
         flushAt: flushAt ?? this.flushAt,
         isHaptic: isHaptic ?? this.isHaptic);
@@ -68,6 +75,7 @@ class _SettingsListState extends State<SettingsList> {
     super.initState();
     _settingsDetail = ChangeSettingsDetail(
         fontColor: widget.fontColor,
+        selectedFontColorIndex: widget.selectedFontColorIndex,
         fontSize: widget.fontSize!,
         flushAt: widget.flushAt!,
         isHaptic: widget.isHaptic!,
@@ -108,6 +116,7 @@ class _SettingsListState extends State<SettingsList> {
     var theme = Theme.of(context);
     final t = AppLocalizations.of(context)!;
     List<Color> colorPallet = _getColorPallet(theme);
+
     return Column(
       children: [
         const SizedBox(height: 86),
@@ -148,15 +157,16 @@ class _SettingsListState extends State<SettingsList> {
                   showSelectedIcon: true,
                   selected: {widget.themeMode!},
                   onSelectionChanged: (selected) {
-                    Color? newFontColor;
+                    // TODO: consider if there is another way to manage "colorPallet"
                     if (selected.first == ThemeMode.light) {
-                      newFontColor = selectedLightColorScheme.onSurface;
+                      colorPallet[0] = selectedLightColorScheme.onSurface;
                     } else {
-                      newFontColor = selectedDarkColorScheme.onSurface;
+                      colorPallet[0] = selectedDarkColorScheme.onSurface;
                     }
                     ScaffoldMessenger.of(context).clearSnackBars();
                     _handleChangedSettings(_settingsDetail?.copyWith(
-                        themeMode: selected.first, fontColor: newFontColor));
+                        themeMode: selected.first,
+                        fontColor: colorPallet[widget.selectedFontColorIndex]));
                   },
                 ),
               ),
@@ -173,12 +183,13 @@ class _SettingsListState extends State<SettingsList> {
                       const EdgeInsets.only(left: 20, right: 16, bottom: 16),
                   child: Row(
                     children: [
-                      for (Color color in colorPallet)
+                      for (int i = 0; i < colorPallet.length; i++)
                         GestureDetector(
                           onTap: () {
-                            if (_settingsDetail!.fontColor != color) {
-                              _handleChangedSettings(
-                                  _settingsDetail?.copyWith(fontColor: color));
+                            if (_settingsDetail!.fontColor != colorPallet[i]) {
+                              _handleChangedSettings(_settingsDetail?.copyWith(
+                                  fontColor: colorPallet[i],
+                                  selectedFontColorIndex: i));
                             }
                           },
                           child: Container(
@@ -190,8 +201,9 @@ class _SettingsListState extends State<SettingsList> {
                                       width: 1,
                                       color: theme.colorScheme.outline),
                                   shape: BoxShape.circle,
-                                  color: color),
-                              child: _settingsDetail!.fontColor == color
+                                  color: colorPallet[i]),
+                              child: _settingsDetail!.selectedFontColorIndex ==
+                                      i
                                   ? Icon(Icons.check,
                                       color: theme.colorScheme.onInverseSurface)
                                   : null),

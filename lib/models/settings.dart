@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SettingsModel with ChangeNotifier {
   static const _keyThemeMode = 'theme_mode';
   static const _keyFontColor = 'font_color';
+  static const _keySelectedFontColorIndex = 'selected_font_color_index';
   static const _keyFontSize = 'font_size';
   static const _keyLastFlushed = 'last_flushed';
   static const _keyFlushAt = 'flush_at';
@@ -22,6 +23,7 @@ class SettingsModel with ChangeNotifier {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   var _themeMode = _defaultThemeMode;
   Color? _fontColor;
+  int _selectedFontColorIndex = 0;
   FontSize _fontSize = _defaultFontSize;
   DateTime _lastFlushed = _defaultLastFlushed;
   TimeOfDay _flushAt = _defaultFlushAt;
@@ -40,6 +42,13 @@ class SettingsModel with ChangeNotifier {
     _store(_keyFontColor, value?.value);
 
     _fontColor = value;
+    notifyListeners();
+  }
+
+  int get selectedFontColorIndex => _selectedFontColorIndex;
+  set selectedFontColorIndex(int index) {
+    _store(_keySelectedFontColorIndex, index);
+    _selectedFontColorIndex = index;
     notifyListeners();
   }
 
@@ -105,6 +114,10 @@ class SettingsModel with ChangeNotifier {
 
     final rawFontColor = preferences.getInt(_keyFontColor);
     _fontColor = rawFontColor != null ? Color(rawFontColor) : null;
+
+    final rawSelectedFontColorIndex =
+        preferences.getInt(_keySelectedFontColorIndex);
+    _selectedFontColorIndex = rawSelectedFontColorIndex ?? 0;
 
     final rawFontSize = preferences.getInt(_keyFontSize);
     _fontSize =
