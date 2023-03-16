@@ -143,7 +143,7 @@ class _PullToRevealState extends State<PullToReveal>
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (widget.controller == null) _controller.dispose();
     _animationController.dispose();
     super.dispose();
   }

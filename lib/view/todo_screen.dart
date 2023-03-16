@@ -46,6 +46,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _pullToRevealController.dispose();
     _focusNode.dispose();
     _limitAnimationController.dispose();
 
