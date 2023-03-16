@@ -69,7 +69,8 @@ class ChangeSettingsDetail {
 }
 
 class _SettingsListState extends State<SettingsList> {
-  ChangeSettingsDetail? _settingsDetail;
+  late ChangeSettingsDetail _settingsDetail;
+
   @override
   void initState() {
     super.initState();
@@ -87,7 +88,7 @@ class _SettingsListState extends State<SettingsList> {
     super.dispose();
   }
 
-  List<Color> _getColorPallet(ThemeData theme) {
+  List<Color> _getColorPalette(ThemeData theme) {
     return [
       theme.colorScheme.onSurface,
       theme.colorScheme.copyWith(primary: const Color(0xff4455ba)).primary,
@@ -98,8 +99,7 @@ class _SettingsListState extends State<SettingsList> {
     ];
   }
 
-  void _handleChangedSettings(ChangeSettingsDetail? newDetails) {
-    if (newDetails == null) return;
+  void _handleChangedSettings(ChangeSettingsDetail newDetails) {
     if (widget.onChange != null) {
       widget.onChange?.call(newDetails);
       _settingsDetail = newDetails;
@@ -115,7 +115,7 @@ class _SettingsListState extends State<SettingsList> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     final t = AppLocalizations.of(context)!;
-    List<Color> colorPallet = _getColorPallet(theme);
+    List<Color> colorPalette = _getColorPalette(theme);
 
     return Column(
       children: [
@@ -155,16 +155,17 @@ class _SettingsListState extends State<SettingsList> {
                   showSelectedIcon: true,
                   selected: {widget.themeMode!},
                   onSelectionChanged: (selected) {
-                    // TODO: consider if there is another way to manage "colorPallet"
-                    if (selected.first == ThemeMode.light) {
-                      colorPallet[0] = selectedLightColorScheme.onSurface;
-                    } else {
-                      colorPallet[0] = selectedDarkColorScheme.onSurface;
-                    }
+                    // TODO: consider if there is another way to manage "colorPalette"
+                    colorPalette.first = selected.first == ThemeMode.light
+                        ? selectedLightColorScheme.onSurface
+                        : selectedDarkColorScheme.onSurface;
                     ScaffoldMessenger.of(context).clearSnackBars();
-                    _handleChangedSettings(_settingsDetail?.copyWith(
+                    _handleChangedSettings(
+                      _settingsDetail.copyWith(
                         themeMode: selected.first,
-                        fontColor: colorPallet[widget.selectedFontColorIndex]));
+                        fontColor: colorPalette[widget.selectedFontColorIndex],
+                      ),
+                    );
                   },
                 ),
               ),
@@ -181,13 +182,16 @@ class _SettingsListState extends State<SettingsList> {
                       const EdgeInsets.only(left: 20, right: 16, bottom: 16),
                   child: Row(
                     children: [
-                      for (int i = 0; i < colorPallet.length; i++)
+                      for (int i = 0; i < colorPalette.length; i++)
                         GestureDetector(
                           onTap: () {
-                            if (_settingsDetail!.fontColor != colorPallet[i]) {
-                              _handleChangedSettings(_settingsDetail?.copyWith(
-                                  fontColor: colorPallet[i],
-                                  selectedFontColorIndex: i));
+                            if (_settingsDetail.fontColor != colorPalette[i]) {
+                              _handleChangedSettings(
+                                _settingsDetail.copyWith(
+                                  fontColor: colorPalette[i],
+                                  selectedFontColorIndex: i,
+                                ),
+                              );
                             }
                           },
                           child: Container(
@@ -195,15 +199,16 @@ class _SettingsListState extends State<SettingsList> {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1,
-                                      color: theme.colorScheme.outline),
-                                  shape: BoxShape.circle,
-                                  color: colorPallet[i]),
-                              child: _settingsDetail!.selectedFontColorIndex ==
-                                      i
-                                  ? Icon(Icons.check,
-                                      color: theme.colorScheme.onInverseSurface)
+                                border: Border.all(
+                                    width: 1, color: theme.colorScheme.outline),
+                                shape: BoxShape.circle,
+                                color: colorPalette[i],
+                              ),
+                              child: _settingsDetail.selectedFontColorIndex == i
+                                  ? Icon(
+                                      Icons.check,
+                                      color: theme.colorScheme.onInverseSurface,
+                                    )
                                   : null),
                         )
                     ],
@@ -233,7 +238,7 @@ class _SettingsListState extends State<SettingsList> {
                   selected: {widget.fontSize!},
                   onSelectionChanged: (selected) {
                     _handleChangedSettings(
-                        _settingsDetail?.copyWith(fontSize: selected.first));
+                        _settingsDetail.copyWith(fontSize: selected.first));
                   },
                 ),
               ),
@@ -264,7 +269,7 @@ class _SettingsListState extends State<SettingsList> {
 
                       if (tod != null) {
                         _handleChangedSettings(
-                            _settingsDetail?.copyWith(flushAt: tod));
+                            _settingsDetail.copyWith(flushAt: tod));
                       }
                     },
                   ),
@@ -282,7 +287,7 @@ class _SettingsListState extends State<SettingsList> {
                       onChanged: (value) {
                         if (value) HapticFeedback.vibrate();
                         _handleChangedSettings(
-                            _settingsDetail?.copyWith(isHaptic: value));
+                            _settingsDetail.copyWith(isHaptic: value));
                       },
                     ),
                   ),
