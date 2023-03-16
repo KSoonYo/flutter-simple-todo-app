@@ -60,7 +60,7 @@ class _TodoScreenState extends State<TodoScreen> with TickerProviderStateMixin {
     todoModel.initialize(AppLocalizations.of(context));
     final t = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    var isHaptic = settingsModel.isHaptic;
+    var isHaptic = settingsModel.hapticEnabled;
 
     return Scaffold(
       body: PullToReveal(

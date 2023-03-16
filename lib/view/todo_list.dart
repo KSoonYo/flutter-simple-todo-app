@@ -155,7 +155,7 @@ class CustomAutomaticAnimatedListReorderModel<T>
   @override
   bool onReorderStart(int index, double dx, double dy) {
     var settingsModel = context.read<SettingsModel>();
-    if (settingsModel.isHaptic) {
+    if (settingsModel.hapticEnabled) {
       HapticFeedback.vibrate();
     }
     return true;

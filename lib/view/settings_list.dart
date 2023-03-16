@@ -40,7 +40,7 @@ class ChangeSettingsDetail {
     required this.fontSize,
     required this.flushAt,
     this.selectedFontColorIndex = 0,
-    this.isHaptic = false,
+    this.hapticEnabled = false,
     this.themeMode = ThemeMode.light,
   });
   final ThemeMode themeMode;
@@ -48,23 +48,25 @@ class ChangeSettingsDetail {
   final int selectedFontColorIndex;
   final FontSize fontSize;
   final TimeOfDay flushAt;
-  final bool isHaptic;
+  final bool hapticEnabled;
 
-  ChangeSettingsDetail copyWith(
-      {ThemeMode? themeMode,
-      Color? fontColor,
-      int? selectedFontColorIndex,
-      FontSize? fontSize,
-      TimeOfDay? flushAt,
-      bool? isHaptic}) {
+  ChangeSettingsDetail copyWith({
+    ThemeMode? themeMode,
+    Color? fontColor,
+    int? selectedFontColorIndex,
+    FontSize? fontSize,
+    TimeOfDay? flushAt,
+    bool? hapticEnabled,
+  }) {
     return ChangeSettingsDetail(
-        themeMode: themeMode ?? this.themeMode,
-        fontColor: fontColor ?? this.fontColor,
-        selectedFontColorIndex:
-            selectedFontColorIndex ?? this.selectedFontColorIndex,
-        fontSize: fontSize ?? this.fontSize,
-        flushAt: flushAt ?? this.flushAt,
-        isHaptic: isHaptic ?? this.isHaptic);
+      themeMode: themeMode ?? this.themeMode,
+      fontColor: fontColor ?? this.fontColor,
+      selectedFontColorIndex:
+          selectedFontColorIndex ?? this.selectedFontColorIndex,
+      fontSize: fontSize ?? this.fontSize,
+      flushAt: flushAt ?? this.flushAt,
+      hapticEnabled: hapticEnabled ?? this.hapticEnabled,
+    );
   }
 }
 
@@ -79,7 +81,7 @@ class _SettingsListState extends State<SettingsList> {
         selectedFontColorIndex: widget.selectedFontColorIndex,
         fontSize: widget.fontSize!,
         flushAt: widget.flushAt!,
-        isHaptic: widget.isHaptic!,
+        hapticEnabled: widget.isHaptic!,
         themeMode: widget.themeMode!);
   }
 
@@ -287,7 +289,7 @@ class _SettingsListState extends State<SettingsList> {
                       onChanged: (value) {
                         if (value) HapticFeedback.vibrate();
                         _handleChangedSettings(
-                            _settingsDetail.copyWith(isHaptic: value));
+                            _settingsDetail.copyWith(hapticEnabled: value));
                       },
                     ),
                   ),

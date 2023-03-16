@@ -8,13 +8,13 @@ class SettingsModel with ChangeNotifier {
   static const _keyFontSize = 'font_size';
   static const _keyLastFlushed = 'last_flushed';
   static const _keyFlushAt = 'flush_at';
-  static const _keyIsHaptic = 'is_haptic';
+  static const _keyHapticEnabled = 'haptic_enabled';
 
   static const _defaultThemeMode = ThemeMode.system;
   static const _defaultFontSize = FontSize.small;
   static final _defaultLastFlushed = DateTime.now();
   static const _defaultFlushAt = TimeOfDay(hour: 3, minute: 0);
-  static const _defaultIsHaptic = false;
+  static const _defaultHapticEnabled = false;
 
   SettingsModel() {
     _load();
@@ -27,7 +27,7 @@ class SettingsModel with ChangeNotifier {
   FontSize _fontSize = _defaultFontSize;
   DateTime _lastFlushed = _defaultLastFlushed;
   TimeOfDay _flushAt = _defaultFlushAt;
-  bool _isHptic = _defaultIsHaptic;
+  bool _hapticEnabled = _defaultHapticEnabled;
 
   ThemeMode get themeMode => _themeMode;
   set themeMode(ThemeMode value) {
@@ -76,10 +76,10 @@ class SettingsModel with ChangeNotifier {
     notifyListeners();
   }
 
-  bool get isHaptic => _isHptic;
-  set isHaptic(bool value) {
-    _store(_keyIsHaptic, value);
-    _isHptic = value;
+  bool get hapticEnabled => _hapticEnabled;
+  set hapticEnabled(bool value) {
+    _store(_keyHapticEnabled, value);
+    _hapticEnabled = value;
     notifyListeners();
   }
 
@@ -135,8 +135,8 @@ class SettingsModel with ChangeNotifier {
             minute: int.parse(rawFlushAt.split(':')[1]))
         : _defaultFlushAt;
 
-    final rawIsHaptic = preferences.getBool(_keyIsHaptic);
-    _isHptic = rawIsHaptic ?? false;
+    final rawHapticEnabled = preferences.getBool(_keyHapticEnabled);
+    _hapticEnabled = rawHapticEnabled ?? false;
 
     notifyListeners();
   }
