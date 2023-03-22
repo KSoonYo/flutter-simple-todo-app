@@ -126,7 +126,7 @@ class _TodoListState extends State<TodoList>
     final todoModel = context.read<TodoModel>();
     var theme = Theme.of(context);
 
-    if (todoModel.cache != null && outdated) {
+    if (outdated) {
       outdated = false;
 
       ScaffoldMessenger.of(context).showSnackBar(
