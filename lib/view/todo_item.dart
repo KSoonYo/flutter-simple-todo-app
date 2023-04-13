@@ -88,7 +88,7 @@ class TodoItem extends StatelessWidget {
 
   TextStyle _getTextStyle(BuildContext context, bool disabled) {
     final theme = Theme.of(context);
-    final model = context.watch<SettingsModel>();
+    final model = context.read<SettingsModel>();
 
     TextStyle style;
 
